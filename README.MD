@@ -1,9 +1,9 @@
 
 ### Download first
-https://code.visualstudio.com/docs/?dv=linux64_deb
-https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-https://discord.com/api/download?platform=linux&format=deb
-https://cdn.akamai.steamstatic.com/client/installer/steam.deb
+[VSCode Deb](https://code.visualstudio.com/docs/?dv=linux64_deb)
+[Chrome Deb](https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb)
+[Discord Deb](https://discord.com/api/download?platform=linux&format=deb)
+[Steam Deb](https://cdn.akamai.steamstatic.com/client/installer/steam.deb)
 
 ### General stuff
 ```bash
@@ -92,7 +92,7 @@ sudo apt install nodejs yarn -y
 
 ### VSCode
 ```bash
-wget https://raw.githubusercontent.com/charleywright/Themes/master/Keybinds.json -O ~/.config/Code/User/keybindings.json
+wget https://raw.githubusercontent.com/charleywright/Themes/master/VSCode/Keybinds.json -O ~/.config/Code/User/keybindings.json
 code --install-extension esbenp.prettier-vscode
 code --install-extension dbaeumer.vscode-eslint
 code --install-extension rvest.vs-code-prettier-eslint
@@ -102,4 +102,13 @@ code --install-extension vuetifyjs.vuetify-vscode
 code --install-extension zhuangtongfa.material-theme
 code --install-extension pkief.material-icon-theme
 code --install-extension xabikos.javascriptsnippets
+code --install-extension ms-dotnettools.csharp # Only if you have already installed the dotnet CLI
+echo "{\"workbench.iconTheme\": \"material-icon-theme\",\"workbench.colorTheme\": \"One Dark Pro\"}" > ~/.config/Code/User/settings.json
+```
+
+### Lutris
+```bash
+sudo add-apt-repository ppa:lutris-team/lutris -y
+sudo apt update
+sudo apt install lutris -y
 ```
