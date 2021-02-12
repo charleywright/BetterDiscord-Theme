@@ -1,333 +1,568 @@
-//META{"name":"DetailedServerTooltips","website":"https://metalloriff.github.io/toms-discord-stuff/","source":"https://github.com/Metalloriff/BetterDiscordPlugins/blob/master/DetailedServerTooltips.plugin.js"}*//
+//META{"name":"DetailedServerTooltips","source":"https://gitlab.com/_Lighty_/bdstuff/blob/master/DetailedServerTooltips.plugin.js","website":"https://_lighty_.gitlab.io/bdstuff/?plugin=DetailedServerTooltips"}*//
+/*@cc_on
+@if (@_jscript)
 
-class DetailedServerTooltips {
+  // Offer to self-install for clueless users that try to run this directly.
+  var shell = WScript.CreateObject('WScript.Shell');
+  var fs = new ActiveXObject('Scripting.FileSystemObject');
+  var pathPlugins = shell.ExpandEnvironmentStrings('%APPDATA%\\BetterDiscord\\plugins');
+  var pathSelf = WScript.ScriptFullName;
+  // Put the user at ease by addressing them in the first person
+  shell.Popup('It looks like you\'ve mistakenly tried to run me directly. \n(Don\'t do that!)', 0, 'I\'m a plugin for BetterDiscord', 0x30);
+  if (fs.GetParentFolderName(pathSelf) === fs.GetAbsolutePathName(pathPlugins)) {
+    shell.Popup('I\'m in the correct folder already.\nJust reload Discord with Ctrl+R.', 0, 'I\'m already installed', 0x40);
+  } else if (!fs.FolderExists(pathPlugins)) {
+    shell.Popup('I can\'t find the BetterDiscord plugins folder.\nAre you sure it\'s even installed?', 0, 'Can\'t install myself', 0x10);
+  } else if (shell.Popup('Should I copy myself to BetterDiscord\'s plugins folder for you?', 0, 'Do you need some help?', 0x34) === 6) {
+    fs.CopyFile(pathSelf, fs.BuildPath(pathPlugins, fs.GetFileName(pathSelf)), true);
+    // Show the user where to put plugins in the future
+    shell.Exec('explorer ' + pathPlugins);
+    shell.Popup('I\'m installed!\nJust reload Discord with Ctrl+R.', 0, 'Successfully installed', 0x40);
+  }
+  WScript.Quit();
 
-	getName() { return "DetailedServerTooltips"; }
-	getDescription() { return "Displays a more detailed tooltip for servers similar to user popouts. Contains a larger image, owner's tag, date, time and days ago created, date, time and days ago joined, member count, channel count, role count, region, and whether or not the server is partnered."; }
-	getVersion() { return "0.3.14"; }
-	getAuthor() { return "Metalloriff"; }
-	getChanges() {
-		return {
-			"0.1.1": `
-				Added a creation date field.
-			`,
-			"0.2.3": `
-				Fixed tooltip color not changing with some themes.
-				Fixed the tooltip arrow being offsetted wrong when the tooltip was prevented from going off-screen.
-				Tooltip guild icons are now full res.
-			`,
-			"0.3.4": `
-				Fixed update notes.
-				Fixed incompatibility with Zerebos' DoNotTrack plugin. (If you still have issues with tooltips sticking with it, please let me know. I barely tested it.)
-				Added a minimal mode setting.
-			`,
-			"0.3.5": `
-				Fixed tooltip getting stuck with ServerFolders
-			`,
-			"0.3.6": `
-				Fixed tooltips getting stuck when switching from dm to a server.
-			`,
-			"0.3.8": `
-				Fixed tooltips not showing for servers inside of folders with DevilBro's ServerFolders plugin.
-			`
-		};
-	}
+@else@*/
 
-	load() {}
-
-	start() {
-		const libLoadedEvent = () => {
-			try{
-				if(window.pluginCookie["DoNotTrack"] == true) setTimeout(() => this.onLibLoaded(), 2000);
-				else this.onLibLoaded();
-			}
-			catch(err) { console.error(this.getName(), "fatal error, plugin could not be started!", err); try { this.stop(); } catch(err) { console.error(this.getName() + ".stop()", err); } }
-		};
-
-		let lib = document.getElementById("NeatoBurritoLibrary");
-		if (!lib) {
-			lib = document.createElement("script");
-			lib.id = "NeatoBurritoLibrary";
-			lib.type = "text/javascript";
-			lib.src = "https://rawgit.com/Metalloriff/BetterDiscordPlugins/master/Lib/NeatoBurritoLibrary.js";
-			document.head.appendChild(lib);
+module.exports = (() => {
+	/* Setup */
+	const config = {
+	  main: 'index.js',
+	  info: { name: 'DetailedServerTooltips', authors: [{ name: 'Lighty', discord_id: '239513071272329217', github_username: 'LightyPon', twitter_username: '' }], version: '1.0.9', description: 'Displays a more detailed server tooltip, containing its image, owner tag, creation date, join date, member count, channel count, role count, region and if the server is partenered.', github: 'https://gitlab.com/_Lighty_', github_raw: 'https://_lighty_.gitlab.io/bdstuff/plugins/DetailedServerTooltips.plugin.js' },
+	  changelog: [{
+		title: 'Fixed',
+		type: 'fixed',
+		items: ['fixed tooltips on canary']
+	  }],
+	  defaultConfig: [
+		{
+		  type: 'category',
+		  id: 'display',
+		  name: 'Display settings',
+		  collapsible: true,
+		  shown: true,
+		  settings: [
+			{ type: 'switch', id: 'showImage', name: 'Show server icon', value: true },
+			{ type: 'switch', id: 'showName', name: 'Show server name', value: true },
+			{ type: 'switch', id: 'showOwner', name: 'Show owner', value: true },
+			{ type: 'switch', id: 'showCreated', name: 'Show date and time created', value: true },
+			{ type: 'switch', id: 'showJoined', name: 'Show date and time joined', value: true },
+			{ type: 'switch', id: 'showMembers', name: 'Show member count', value: true },
+			{ type: 'switch', id: 'showChannels', name: 'Show channel count', value: true },
+			{ type: 'switch', id: 'showRoles', name: 'Show role count', value: true },
+			{ type: 'switch', id: 'showRegion', name: 'Show region', value: true },
+			{ type: 'switch', id: 'showPartnered', name: 'Show if partenered', value: true },
+			{ type: 'switch', id: 'voiceSummary', name: 'Show voice summary', value: true },
+			{ type: 'switch', id: 'removeBoldText', name: 'Disable bold text in detailed tooltip', value: true },
+			{ type: 'switch', id: 'dontCoverAnyServers', name: 'Show tooltip next to the sidebar, as to not cover up any servers.', value: false },
+			{
+			  type: 'textbox',
+			  id: 'showDelay',
+			  name: 'Detailed tooltip show delay',
+			  note: 'Set to 0 to instantly show',
+			  value: 750
+			},
+			{ type: 'preview' }
+		  ]
 		}
-
-		this.forceLoadTimeout = setTimeout(libLoadedEvent, 30000);
-		if (typeof window.NeatoLib !== "undefined") libLoadedEvent();
-		else lib.addEventListener("load", libLoadedEvent);
-	}
-
-	get settingFields() {
-		return {
-			tooltipColor: { label: "Tooltip color", type: "color" },
-			displayDelay: { label: "Tooltip display delay", description: "(ms)", type: "int" },
-			preview: { type: "custom", html: `
-					<div class="tooltip tooltip-right dst-tooltip" style="position: relative; margin-top: 20px;">
-							Kappa Stretch Server
-							<div class="dst-tooltip-icon" style="background-image: url(https://cdn.discordapp.com/attachments/392905457486004224/457784406313271296/KappaStretch.png);"></div>
-							<div id="dst-tooltip-owner-label" class="dst-tooltip-label">Owner: KappaStretch#0000</div>
-							<div class="dst-tooltip-label">Joined at: ${new Date().toLocaleDateString()}, ${new Date().toLocaleTimeString()} (0 days ago)</div>
-							<div id="dst-tooltip-member-count-label" class="dst-tooltip-label">400 members</div>
-							<div class="dst-tooltip-label">15 channels</div>
-							<div class="dst-tooltip-label">10 roles</div>
-							<div class="dst-tooltip-label">Region: us-central</div>
-							<div style="font-weight: bolder;" class="dst-tooltip-label"><div class="profileBadgePartner-SjK6L2 profileBadge-2BqF-Z" style="display: inline-block;"></div>PARTNERED SERVER</div>
-					</div>
-			` },
-			minimalMode: { label: "Minimal mode", type: "bool" },
-			minimalPreview: { type: "custom", html: `
-					<div class="tooltip tooltip-right dst-tooltip dst-min" style="position: relative; margin-top: 20px;">
-							Kappa Stretch Server
-							<div class="dst-tooltip-icon" style="background-image: url(https://cdn.discordapp.com/attachments/392905457486004224/457784406313271296/KappaStretch.png);"></div>
-							<div id="dst-tooltip-owner-label" class="dst-tooltip-label">Owner: KappaStretch#0000</div>
-							<div class="dst-tooltip-label">Joined at: ${new Date().toLocaleDateString()}, ${new Date().toLocaleTimeString()} (0 days ago)</div>
-							<div id="dst-tooltip-member-count-label" class="dst-tooltip-label">400 members</div>
-							<div class="dst-tooltip-label">15 channels</div>
-							<div class="dst-tooltip-label">10 roles</div>
-							<div class="dst-tooltip-label">Region: us-central</div>
-							<div style="font-weight: bolder;" class="dst-tooltip-label"><div class="profileBadgePartner-SjK6L2 profileBadge-2BqF-Z" style="display: inline-block;"></div>PARTNERED SERVER</div>
-					</div>
-			` }
-		};
-	}
-
-	get defaultSettings() {
-		return {
-			displayUpdateNotes: true,
-			tooltipColor: "#7289da",
-			displayDelay: 500,
-			minimalMode: false
-		};
-	}
-
-	getSettingsPanel() {
-		return NeatoLib.Settings.createPanel(this);
-	}
-
-	saveSettings() {
-		this.applyCSS();
-		NeatoLib.Settings.save(this);
-	}
-
-	applyCSS() {
-		if (this.style) this.style.destroy();
-
-		this.style = NeatoLib.injectCSS(`
-			.dst-tooltip {
-					width: 225px;
-					max-width: 225px;
-					text-align: center;
-					background-color: ${this.settings.tooltipColor} !important;
-					color: white;
-			}
-
-			.dst-tooltip:after {
-					border-right-color: ${this.settings.tooltipColor} !important;
-					top: 25px !important;
-			}
-
-			.dst-tooltip-icon {
-					width: 200px;
-					height: 200px;
-					background-size: cover;
-					border-radius: 5px;
-					margin-top: 5px;
-					flex: 1;
-			}
-
-			.dst-tooltip-label {
-					color: white;
-					margin-top: 10px;
-					font-size: 15px;
-			}
-
-			.dst-min .dst-tooltip-icon{display:none}
-			.dst-min .dst-tooltip-label{font-size:13px}
-			.dst-tooltip.dst-min{max-width:200px}
-	`);
-	}
-
-	onLibLoaded() {
-		if (!NeatoLib.hasRequiredLibVersion(this, "0.8.20")) return;
-
-		NeatoLib.Settings.load(this);
-
-		NeatoLib.Updates.check(this);
-
-		if (this.settings.displayUpdateNotes) NeatoLib.Changelog.compareVersions(this.getName(), this.getChanges());
-
-		this.guildModule = NeatoLib.Modules.get("getGuild");
-		this.userModule = NeatoLib.Modules.get("getUser");
-		this.memberModule = NeatoLib.Modules.get("getMembers");
-		this.channelModule = NeatoLib.Modules.get("getChannel");
-		this.memberCountModule = NeatoLib.Modules.get("getMemberCount");
-
-		this.localUser = NeatoLib.getLocalUser();
-
-		this.owners = {};
-
-		this.applyCSS();
-
-		let tooltip, timeout;
-
-		this.dragGuild = () => {
-			this.mouseLeaveGuild();
-
-			let tooltips = document.getElementsByClassName("dst-tooltip");
-
-			for (let i = 0; i < tooltips.length; i++) {
-				if (tooltips[i].updateLoop) clearInterval(tooltips[i].updateLoop);
-				tooltips[i].remove();
-			}
-		};
-
-		this.mouseEnterGuild = e => {
-			timeout = setTimeout(() => {
-				tooltip = this.tooltip(((e.target.parentElement.href || e.target.href).match(/\d+/) || [])[0], e.target);
-				if (!tooltip) return;
-				let tt = document.getElementsByClassName(NeatoLib.getClass("tooltip"))[0];
-				tt.appendChild(tooltip);
-				tt.getElementsByClassName(NeatoLib.getClass("tooltip", "tooltipPointer"))[0].style.borderTopColor = this.settings.tooltipColor;
-				let bottomPos = parseFloat(tooltip.style.top) + tooltip.offsetHeight;
-				if (bottomPos > window.innerHeight) {
-					tooltip.style.top = (parseFloat(tooltip.style.top) - (bottomPos - window.innerHeight)) + "px";
-					tooltip.insertAdjacentHTML("afterbegin", `<style>.dst-tooltip:after{top:calc(25px + ${parseFloat(tooltip.style.top) - (parseFloat(tooltip.style.top) - (bottomPos - window.innerHeight))}px) !important}</style>`);
+	  ]
+	};
+  
+	/* Build */
+	const buildPlugin = ([Plugin, Api]) => {
+	  const { Settings, Utilities, WebpackModules, DiscordModules, ReactTools, ReactComponents, Patcher, PluginUtilities, Logger } = Api;
+	  const { React, UserStore, MemberCountStore, GuildStore } = DiscordModules;
+	  const joinClassNames = WebpackModules.getModule(e => e.default && e.default.default);
+	  const partneredClassNames = joinClassNames(WebpackModules.getByProps('profileBadgePartner').profileBadge, WebpackModules.getByProps('profileBadgePartner').profileBadgePartner);
+	  const AvatarsIconsModule = WebpackModules.getByProps('hasAnimatedGuildIcon');
+	  const CGuild = WebpackModules.getByPrototypes('getIconURL', 'getMaxEmojiSlots', 'isOwner');
+	  const Tooltip = WebpackModules.getByDisplayName('Tooltip');
+	  const SupportServer =
+		GuildStore.getGuild('389049952732446731') ||
+		new CGuild({
+		  name: "Lighty's epic place",
+		  ownerId: '239513071272329217',
+		  joinedAt: new Date(),
+		  icon: 'dd46afe197cfdddb938ceb79af0133b0',
+		  region: 'eu-central',
+		  id: '389049952732446731'
+		});
+  
+	  const getUser = WebpackModules.getByProps('getUser', 'acceptAgreements').getUser;
+	  const requestUser = (id, onComplete) => {
+		if (requestUser.requests.findIndex(m => m.id === id) === -1) {
+		  requestUser.requests.push({ id, onComplete });
+		  if (!requestUser._requesting) {
+			requestUser._requesting = true;
+			const req = () => {
+			  /* I'm not very creative today with names */
+			  const yeehaw = requestUser.requests.shift();
+			  getUser(yeehaw.id).then(e => {
+				yeehaw.onComplete(e);
+				if (requestUser.requests.length) {
+				  req();
+				} else {
+				  requestUser._requesting = false;
 				}
-				var tooltipObserver = new MutationObserver((mutations) => {
-					mutations.forEach((mutation) => {
-						var nodes = Array.from(mutation.removedNodes);
-						var ownMatch = nodes.indexOf(tooltip) > -1;
-						var directMatch = nodes.indexOf(e.target) > -1;
-						var parentMatch = nodes.some(parent => parent.contains(e.target));
-						if (ownMatch || directMatch || parentMatch) {
-							tooltipObserver.disconnect();
-							tooltip.remove();
-						}
-					});
-				});
-			}, this.settings.displayDelay);
-		};
-
-		this.mouseLeaveGuild = () => {
-			clearTimeout(timeout);
-			if (tooltip) tooltip.remove();
-		};
-
-		this.switchEvent = () => this.applyToGuilds();
-
-		this.guildObserver = new MutationObserver(this.switchEvent);
-		this.guildObserver.observe(document.getElementsByClassName(NeatoLib.getClass("unreadMentionsBar", "scroller"))[0], { childList: true, subtree: true });
-
-		NeatoLib.Events.attach("switch", this.switchEvent);
-
-		this.applyToGuilds();
-
-		NeatoLib.Events.onPluginLoaded(this);
-	}
-
-	applyToGuilds(detach) {
-		const guilds = document.getElementsByClassName(NeatoLib.getClass("acronym", "wrapper"));
-
-		for (let i = 0; i < guilds.length; i++) {
-			let reactEvents = NeatoLib.ReactData.getEvents(guilds[i]);
-
-			guilds[i].parentElement.removeEventListener("dragstart", this.dragGuild);
-			guilds[i].parentElement.removeEventListener("dragend", this.dragGuild);
-			guilds[i].removeEventListener("mouseenter", this.mouseEnterGuild);
-			guilds[i].removeEventListener("mouseleave", this.mouseLeaveGuild);
-
-			if (detach) continue;
-
-			guilds[i].parentElement.addEventListener("dragstart", this.dragGuild);
-			guilds[i].parentElement.addEventListener("dragend", this.dragGuild);
-			guilds[i].addEventListener("mouseenter", this.mouseEnterGuild);
-			guilds[i].addEventListener("mouseleave", this.mouseLeaveGuild);
+			  });
+			};
+			req();
+		  }
 		}
-	}
-
-	tooltip(guildId, element) {
-		if (!guildId || !element || element.getBoundingClientRect().width == 0) return;
-
-		let tooltip = document.createElement("div"),
-			guild = this.guildModule.getGuild(guildId),
-			owner = this.userModule.getUser(guild.ownerId);
-
-		tooltip.className = NeatoLib.getClass("tooltip") + " " + NeatoLib.getClass("tooltip", "tooltipRight") + " dst-tooltip";
-		if (this.settings.minimalMode) tooltip.classList.add("dst-min");
-
-		tooltip.style.top = "0";
-		tooltip.style.left = "0";
-		tooltip.style.position = "fixed";
-
-		let creationDate = NeatoLib.getSnowflakeCreationDate(guild.id);
-
-		var imgURL = guild.getIconURL(guild && guild.icon && guild.icon.startsWith('a_') ? 'gif' : 'webp');
-		
-		tooltip.innerHTML = `${this.escapeHtml(guild.name)}
-				<div class="dst-tooltip-icon" style="background-image: url(${imgURL}?size=2048);"></div>
-				<div id="dst-tooltip-owner-label" class="dst-tooltip-label">Owner: ${owner ? this.escapeHtml(owner.tag) : "unknown"}</div>
-				<div class="dst-tooltip-label">Created at: ${creationDate.toLocaleDateString()}, ${creationDate.toLocaleTimeString()} (${Math.round(Math.abs(creationDate.getTime() - new Date().getTime()) / 86400000)} days ago)</div>
-				${creationDate.toString() == guild.joinedAt.toString() ? "" : `<div class="dst-tooltip-label">Joined at: ${guild.joinedAt.toLocaleDateString()}, ${guild.joinedAt.toLocaleTimeString()} (${Math.round(Math.abs(guild.joinedAt.getTime() - new Date().getTime()) / 86400000)} days ago)</div>`}
-				<div id="dst-tooltip-member-count-label" class="dst-tooltip-label">${this.memberCountModule.getMemberCount(guildId)} members</div>
-				<div class="dst-tooltip-label">${Object.values(this.channelModule.getChannels()).filter(c => c.guild_id == guildId).length} channels</div>
-				<div class="dst-tooltip-label">${Object.keys(guild.roles).length} roles</div>
-				<div class="dst-tooltip-label">Region: ${guild.region}</div>`;
-
-		if(!guild.getIconURL()) tooltip.find(".dst-tooltip-icon").outerHTML = "";
-
-		if (guild.features.has("PARTNERED")) tooltip.insertAdjacentHTML("beforeend", `<div style="font-weight: bolder;" class="dst-tooltip-label"><div class="profileBadgePartner-SjK6L2 profileBadge-2BqF-Z" style="display: inline-block;"></div>PARTNERED SERVER</div>`);
-
-		if(owner){
-			this.owners[guildId] = owner.tag;
-		}else{
-			NeatoLib.Modules.get("getAPIBaseURL").get(NeatoLib.Modules.get(["Permissions", "ActivityTypes", "StatusTypes"]).Endpoints.USER(guild.ownerId)).then(result => {
-				if(!result) return;
-				let res = JSON.parse(result.text);
-				this.owners[guildId] = res.username + "#" + res.discriminator;
+	  };
+	  requestUser.requests = [];
+  
+	  class DataLine extends React.PureComponent {
+		render() {
+		  return React.createElement(
+			'div',
+			{
+			  className: 'DSTT-dataline'
+			},
+			React.createElement(
+			  'div',
+			  {
+				className: 'DSTT-data'
+			  },
+			  this.props.children
+			)
+		  );
+		}
+	  }
+  
+	  const GetClass = arg => {
+		const args = arg.split(' ');
+		return WebpackModules.getByProps(...args)[args[args.length - 1]];
+	  };
+	  const GetSingleClass = arg => GetClass(arg).split(' ')[0];
+  
+	  const ChannelStore = WebpackModules.getByProps('getChannel', 'getDMFromUserId');
+  
+	  class CustomTooltip extends React.Component {
+		render() {
+		  const owner = UserStore.getUser(this.props.guild.ownerId);
+		  if (!owner) {
+			requestUser(this.props.guild.ownerId, userData => setTimeout(this.props.forceUpdate, 100));
+		  }
+		  const createdAt = (id => {
+			/* stolen from NeatoLib xd */
+			const toBinary = sf => {
+			  let binary = '',
+				high = parseInt(sf.slice(0, -10)) || 0,
+				low = parseInt(sf.slice(-10));
+			  while (low > 0 || high > 0) {
+				binary = String(low & 1) + binary;
+				low = Math.floor(low / 2);
+				if (high > 0) {
+				  low += 5000000000 * (high % 2);
+				  high = Math.floor(high / 2);
+				}
+			  }
+			  return binary;
+			};
+			return new Date(
+			  parseInt(
+				toBinary(id)
+				  .padStart(64)
+				  .substring(0, 42),
+				2
+			  ) + 1420070400000
+			);
+		  })(this.props.guild.id);
+		  const iconURL = this.props.guild.getIconURL(AvatarsIconsModule.hasAnimatedGuildIcon(this.props.guild) ? 'gif' : 'webp');
+		  let ref;
+		  const fixAlignment = () => {
+			if (!ref) return;
+			const bcr = ref.parentElement.getBoundingClientRect();
+			if (bcr.top < 0) {
+			  ref.style.paddingTop = -bcr.top + 'px';
+			} else if (bcr.bottom > window.innerHeight) {
+			  ref.parentElement.parentElement.parentElement.style.top = window.innerHeight - bcr.height + 'px';
+			}
+			if (this.props.settings.dontCoverAnyServers) {
+			  const sidebar = document.querySelector('.SFV2-folder') || document.querySelector(`.${GetSingleClass('hasNotice container')} > .${GetSingleClass('hasNotice guilds')}`);
+			  if (sidebar) {
+				ref.parentElement.parentElement.style.left = sidebar.getBoundingClientRect().right + 'px';
+			  }
+			}
+		  };
+		  return React.createElement(
+			'div',
+			{
+			  ref: e => {
+				ref = e;
+				fixAlignment();
+			  }
+			},
+			iconURL &&
+			this.props.settings.showImage &&
+			React.createElement(
+			  DataLine,
+			  {},
+			  React.createElement('img', {
+				src: iconURL,
+				onLoad: () => setImmediate(fixAlignment)
+			  })
+			),
+			this.props.settings.showName && React.createElement(DataLine, {}, this.props.guild.name),
+			this.props.settings.showOwner && React.createElement(DataLine, {}, `Owner: ${owner ? owner.tag : 'unknown'}`),
+			this.props.settings.showCreated && React.createElement(DataLine, {}, `Created: ${createdAt.toLocaleDateString()}, ${createdAt.toLocaleTimeString()} (${Math.round(Math.abs(createdAt.getTime() - new Date().getTime()) / 86400000)} days ago)`),
+			this.props.settings.showJoined && this.props.guild.joinedAt && createdAt.toString() !== this.props.guild.joinedAt.toString() && React.createElement(DataLine, {}, `Joined: ${this.props.guild.joinedAt.toLocaleDateString()}, ${this.props.guild.joinedAt.toLocaleTimeString()} (${Math.round(Math.abs(this.props.guild.joinedAt.getTime() - new Date().getTime()) / 86400000)} days ago)`),
+			this.props.settings.showMembers && React.createElement(DataLine, {}, `${MemberCountStore.getMemberCount(this.props.guild.id) || 0} members`),
+			this.props.settings.showChannels && React.createElement(DataLine, {}, `${Object.values(ChannelStore.getMutableGuildChannels ? ChannelStore.getMutableGuildChannels() : ChannelStore.getGuildChannels()).filter(e => e.guild_id === this.props.guild.id).length} channels`),
+			this.props.settings.showRoles && React.createElement(DataLine, {}, `${Object.keys(this.props.guild.roles).length} roles`),
+			this.props.settings.showRegion && React.createElement(DataLine, {}, this.props.guild.region),
+			this.props.settings.showPartnered &&
+			this.props.guild.features.has('PARTNERED') &&
+			React.createElement(
+			  DataLine,
+			  {},
+			  React.createElement('div', {
+				className: partneredClassNames,
+				style: {
+				  display: 'inline-flex'
+				}
+			  }),
+			  React.createElement(
+				'b',
+				{
+				  style: {
+					display: 'inline-flex'
+				  }
+				},
+				'Partnered server'
+			  )
+			),
+			this.props.settings.voiceSummary && this.props.voiceSummary
+		  );
+		}
+	  }
+  
+	  const tooltipClasses = joinClassNames(WebpackModules.getByProps('tooltip').tooltip, WebpackModules.getByProps('tooltipBlack').tooltipBlack);
+  
+	  class Preview extends React.Component {
+		render() {
+		  return React.createElement(
+			'div',
+			{
+			  id: 'TooltipPreview',
+			  style: {
+				display: 'flex',
+				justifyContent: 'center',
+				alignItems: 'center'
+			  }
+			},
+			React.createElement(
+			  'div',
+			  {
+				className: tooltipClasses
+			  },
+			  React.createElement(CustomTooltip, this.props)
+			)
+		  );
+		}
+	  }
+  
+	  class PreviewField extends Settings.SettingField {
+		constructor(name, note, data, onChange) {
+		  super(name, note, onChange, Preview, data);
+		}
+	  }
+  
+	  class Textbox extends Settings.SettingField {
+		constructor(name, note, value, onChange, options = {}) {
+		  super(name, note, onChange, DiscordModules.Textbox, {
+			onChange: textbox => value => {
+			  if (isNaN(value)) return;
+			  textbox.props.value = value;
+			  textbox.forceUpdate();
+			  this.onChange(parseInt(value));
+			},
+			value: value,
+			placeholder: options.placeholder ? options.placeholder : ''
+		  });
+		}
+	  }
+  
+	  class DSTTErrorBoundary extends React.PureComponent {
+		constructor(props) {
+		  super(props);
+		  this.state = { hasError: false };
+		}
+		componentDidCatch(err, inf) {
+		  Logger.err(`Error in ${this.props.label}, screenshot or copy paste the error above to Lighty for help.`);
+		  this.setState({ hasError: true });
+		  if (typeof this.props.onError === 'function') this.props.onError(err);
+		}
+		render() {
+		  if (this.state.hasError) return null;
+		  return this.props.children;
+		}
+	  };
+  
+	  return class DetailedServerTooltips extends Plugin {
+		onStart() {
+		  PluginUtilities.addStyle(
+			this.short,
+			`
+		  .DSTT-header {
+			  text-align: center;
+			  border-width: 3px;
+			  border-bottom-style: solid;
+			  border-image: radial-gradient(hsla(0, 0%, 38%, 1), black);
+			  border-image-slice: 1;
+			  /* font-weight: bold; */
+		  }
+		  .DSTT-data {
+			  text-align: center;
+		  }
+		  .DSTT-data {
+			  display: flex;
+			  justify-content: center;
+			  align-items: center;
+		  }
+		  .DSTT-dataline:not(:nth-of-type(2)):not(:last-of-type) {
+			  padding-bottom: 4px;
+		  }
+		  `
+		  );
+		  this.requestedUsers = [];
+		  this.patchAll();
+		}
+		onStop() {
+		  PluginUtilities.removeStyle(this.short);
+		  this.promises.cancel();
+		  this.__unpatch();
+		  Patcher.unpatchAll();
+		}
+  
+		buildSetting(data) {
+		  if (data.type === 'preview') {
+			return new PreviewField(data.name, data.note, {
+			  guild: SupportServer,
+			  settings: this.settings.display,
+			  forceUpdate: () => ReactTools.getOwnerInstance(document.getElementById('TooltipPreview')).forceUpdate()
 			});
+		  } else if (data.type === 'textbox') {
+			const { name, note, type, value, onChange, id } = data;
+			const setting = new Textbox(name, note, value, onChange, { placeholder: data.placeholder || '' });
+			if (id) setting.id = id;
+			return setting;
+		  }
+		  return super.buildSetting(data);
 		}
-
-		let updateMemberCount = false;
-		if(this.memberCountModule.getMemberCount(guildId) < 500){
-			NeatoLib.Modules.get("requestMembers").requestMembers(guildId, "", 0);
-			updateMemberCount = true;
+  
+		/* patches */
+  
+		patchAll() {
+		  this.promises = {
+			state: { cancelled: false },
+			cancel() {
+			  this.state.cancelled = true;
+			}
+		  };
+		  Utilities.suppressErrors(this.patchGuildIcon.bind(this), 'guild icon patch')(this.promises.state);
 		}
-
-		const self = setInterval(() => {
-			if (!Array.from(document.getElementsByClassName(NeatoLib.getClass("tooltip"))).includes(tooltip)) return clearInterval(self);
-			document.getElementById("dst-tooltip-owner-label").innerHTML = "Owner: " + (this.escapeHtml(this.owners[guildId] || "unknown"));
-			if(updateMemberCount) document.getElementById("dst-tooltip-member-count-label").innerText = this.memberModule.getMembers(guildId).length + " members";
-		}, 500);
-
-		tooltip.updateLoop = self;
-
-		return tooltip;
-	}
-
-	stop() {
-		let tooltips = document.getElementsByClassName("dst-tooltip");
-
-		for (let i = 0; i < tooltips.length; i++) {
-			if (tooltips[i].updateLoop) clearInterval(tooltips[i].updateLoop);
-			tooltips[i].remove();
+  
+		async patchGuildIcon(promiseState) {
+		  const Guild = await ReactComponents.getComponentByName('Guild', '.' + WebpackModules.getByProps('listItem').listItem.split(' ')[0]);
+		  if (promiseState.cancelled) return;
+		  /*
+			  _ _
+			  D etailed
+			  S erver
+			  T ool
+			  T ips
+			  T imeout
+		  */
+		  Patcher.after(Guild.component.prototype, 'componentWillUnmount', (_this, args, ret) => {
+			if (_this._DSTTT) {
+			  clearTimeout(_this._DSTTT);
+			  _this._DSTTT = 0;
+			}
+		  });
+		  Patcher.before(Guild.component.prototype, 'render', (_this, args, ret) => {
+			if (promiseState.cancelled || !this.settings.display.showDelay) return;
+			if (!_this.handleMouseEnter._DSTTPatched) {
+			  const oHandleMouseEnter = _this.handleMouseEnter;
+			  _this.handleMouseEnter = e => {
+				_this._DSTTT = setTimeout(() => {
+				  _this._DSTTT = 0;
+				  _this.setState({
+					_DSTTActive: true
+				  });
+				}, this.settings.display.showDelay);
+				oHandleMouseEnter(e);
+			  };
+			  _this.handleMouseEnter._DSTTPatched = true;
+			}
+			if (!_this.handleMouseLeave._DSTTPatched) {
+			  const oHandleMouseLeave = _this.handleMouseLeave;
+			  _this.handleMouseLeave = e => {
+				if (_this._DSTTT) {
+				  clearTimeout(_this._DSTTT);
+				  _this._DSTTT = 0;
+				}
+				oHandleMouseLeave(e);
+				setTimeout(() => {
+				  _this.state._DSTTActive = false;
+				}, 100);
+			  };
+			  _this.handleMouseLeave._DSTTPatched = true;
+			}
+		  });
+		  const GuildTooltip = WebpackModules.getByDisplayName('GuildTooltip');
+		  const patchFunc = e => {
+			const ret2 = GuildTooltip(e);
+			if (e._DSTTActive) {
+			  try {
+				const { type } = ret2.props.text || {};
+				ret2.props.text = React.createElement(DSTTErrorBoundary, { label: 'DSTT' }, React.createElement(CustomTooltip, {
+				  guild: e.guild,
+				  forceUpdate: () => ReactTools.Reflect(document.querySelector(`.${WebpackModules.getByProps('tooltip').tooltip.split(' ')[0]} > div:last-child`)).forceUpdate(),
+				  settings: this.settings.display,
+				  voiceSummary: type ? type(e).props.children[1] : null
+				}));
+				ret2.props.ref = e => e && e.handleMouseEnter();
+			  } catch (e) {}
+			  if (this.settings.display.removeBoldText) ret2.props.tooltipClassName = '';
+			}
+			return ret2;
+		  };
+		  Patcher.after(Guild.component.prototype, 'render', (_this, args, ret) => {
+			if (promiseState.cancelled) return;
+			const child = Utilities.getNestedProp(ret, 'props.children.props.children.1');
+			if (!child) return;
+			if (_this.props.dragging || _this.props.draggingGuildId === _this.props.guildId) return;
+			child.type = patchFunc;
+			child.props._DSTTActive = _this.state._DSTTActive || !this.settings.display.showDelay;
+		  });
+		  /* to properly unpatch, we have to force an update first */
+		  this.__unpatch = Guild.forceUpdateAll;
+		  Guild.forceUpdateAll();
 		}
-
-		this.applyToGuilds(true);
-
-		if (this.style) this.style.destroy();
-
-		NeatoLib.Events.detach("switch", this.switchEvent);
-
-		this.guildObserver.disconnect();
-	}
-
-	escapeHtml(txt){
-		return txt.replace(/&/g, "&amp;")
-				  .replace(/</g, "&lt;")
-				  .replace(/>/g, "&gt;")
-				  .replace(/"/g, "&quot;")
-				  .replace(/'/g, "&#039;");
-	}
-
-}
+  
+		/* patches end */
+  
+		getSettingsPanel() {
+		  const panel = this.buildSettingsPanel();
+		  panel.addListener(() => ReactTools.getOwnerInstance(document.getElementById('TooltipPreview')).forceUpdate());
+		  return panel.getElement();
+		}
+  
+		get [Symbol.toStringTag]() {
+		  return 'Plugin';
+		}
+		get css() {
+		  return this._css;
+		}
+		get name() {
+		  return config.info.name;
+		}
+		get short() {
+		  let string = '';
+  
+		  for (let i = 0, len = config.info.name.length; i < len; i++) {
+			const char = config.info.name[i];
+			if (char === char.toUpperCase()) string += char;
+		  }
+  
+		  return string;
+		}
+		get author() {
+		  return config.info.authors.map(author => author.name).join(', ');
+		}
+		get version() {
+		  return config.info.version;
+		}
+		get description() {
+		  return config.info.description;
+		}
+	  };
+	};
+  
+	/* Finalize */
+  
+	return !global.ZeresPluginLibrary
+	  ? class {
+		getName() {
+		  return this.name.replace(/\s+/g, '');
+		}
+  
+		getAuthor() {
+		  return this.author;
+		}
+  
+		getVersion() {
+		  return this.version;
+		}
+  
+		getDescription() {
+		  return this.description;
+		}
+  
+		stop() { }
+  
+		load() {
+		  const title = 'Library Missing';
+		  const ModalStack = window.BdApi.findModuleByProps('push', 'update', 'pop', 'popWithKey');
+		  const TextElement = window.BdApi.findModuleByProps('Sizes', 'Weights');
+		  const ConfirmationModal = window.BdApi.findModule(m => m.defaultProps && m.key && m.key() === 'confirm-modal');
+		  if (!ModalStack || !ConfirmationModal || !TextElement) return window.BdApi.getCore().alert(title, `The library plugin needed for ${config.info.name} is missing.<br /><br /> <a href="https://betterdiscord.net/ghdl?url=https://raw.githubusercontent.com/rauenzi/BDPluginLibrary/master/release/0PluginLibrary.plugin.js" target="_blank">Click here to download the library!</a>`);
+		  ModalStack.push(function (props) {
+			return window.BdApi.React.createElement(
+			  ConfirmationModal,
+			  Object.assign(
+				{
+				  header: title,
+				  children: [
+					BdApi.React.createElement(TextElement, {
+					  color: TextElement.Colors.PRIMARY,
+					  children: [`The library plugin needed for ${config.info.name} is missing. Please click Download Now to install it.`]
+					})
+				  ],
+				  red: false,
+				  confirmText: 'Download Now',
+				  cancelText: 'Cancel',
+				  onConfirm: () => {
+					require('request').get('https://rauenzi.github.io/BDPluginLibrary/release/0PluginLibrary.plugin.js', async (error, response, body) => {
+					  if (error) return require('electron').shell.openExternal('https://betterdiscord.net/ghdl?url=https://raw.githubusercontent.com/rauenzi/BDPluginLibrary/master/release/0PluginLibrary.plugin.js');
+					  await new Promise(r => require('fs').writeFile(require('path').join(window.ContentManager.pluginsFolder, '0PluginLibrary.plugin.js'), body, r));
+					});
+				  }
+				},
+				props
+			  )
+			);
+		  });
+		}
+  
+		start() { }
+		get [Symbol.toStringTag]() {
+		  return 'Plugin';
+		}
+		get name() {
+		  return config.info.name;
+		}
+		get short() {
+		  let string = '';
+		  for (let i = 0, len = config.info.name.length; i < len; i++) {
+			const char = config.info.name[i];
+			if (char === char.toUpperCase()) string += char;
+		  }
+		  return string;
+		}
+		get author() {
+		  return config.info.authors.map(author => author.name).join(', ');
+		}
+		get version() {
+		  return config.info.version;
+		}
+		get description() {
+		  return config.info.description;
+		}
+	  }
+	  : buildPlugin(global.ZeresPluginLibrary.buildPlugin(config));
+  })();
+  
+  /*@end@*/
+  
