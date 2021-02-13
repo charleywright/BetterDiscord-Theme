@@ -113,3 +113,12 @@ sudo add-apt-repository ppa:lutris-team/lutris -y
 sudo apt update
 sudo apt install lutris -y
 ```
+
+### Sync snap apps on login (Add to .bashrc or .zshrc)
+```bash
+for i in /var/lib/snapd/desktop/applications/*.desktop; do
+    if [ ! -f ~/.local/share/applications/${i##*/} ];then
+            ln -s /var/lib/snapd/desktop/applications/${i##*/} ~/.local/share/applications/${i##*/};
+    fi;
+done
+```
