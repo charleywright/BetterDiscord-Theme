@@ -1,19 +1,45 @@
-function waitForElement(els, func) {
+// Hide popover message
+document.getElementById("popover-container").style.height = 0;
+
+// Get stored hidden sidebar list
+let appHiddenList = [];
+try {
+    const rawList = JSON.parse(localStorage.getItem("sidebar-app-hide-list"));
+    if (!Array.isArray(rawList)) throw 0;
+    appHiddenList.push(...rawList);
+} catch {
+    localStorage.setItem("sidebar-app-hide-list", "[]")
+}
+
+new Spicetify.ContextMenu.Item(
+    "Hide",
+    ([uri]) => {
+        appHiddenList.push(uri.replace("spotify:special:sidebarapp:", ""));
+        localStorage.setItem("sidebar-app-hide-list", JSON.stringify(appHiddenList));
+        window.location.reload();
+    },
+    ([uri]) => uri.startsWith("spotify:special:sidebarapp:")
+).register();
+
+for (const app of appHiddenList) {
+    new Spicetify.ContextMenu.Item(
+        "Show " + app.replace("spotify:app:", ""),
+        () => {
+            appHiddenList = appHiddenList.filter(item => item !== app);
+            localStorage.setItem("sidebar-app-hide-list", JSON.stringify(appHiddenList));
+            window.location.reload();
+        },
+        ([uri]) => uri.startsWith("spotify:special:sidebarapp:")
+    ).register();
+}
+
+function waitForElement(els, func, timeout = 100) {
     const queries = els.map(el => document.querySelector(el));
     if (queries.every(a => a)) {
         func(queries);
-    } else {
-        setTimeout(waitForElement, 300, els, func);
+    } else if (timeout > 0) {
+        setTimeout(waitForElement, 300, els, func, --timeout);
     }
-}
-
-// Remove Recently Played app
-if (Spicetify.Abba) {
-    if (!Spicetify.Abba.getOverrideFlags()["ab_no_recently_played_desktop"]) {
-        Spicetify.Abba.addOverrideFlag("ab_no_recently_played_desktop", "no-recently-played");
-    }
-} else {
-    console.info(`Please upgrade spicetify to v0.9.9 or above. Then run "spicetify restore backup apply"`)
 }
 
 // Add "Open User Profile" item in profile menu
@@ -26,8 +52,11 @@ waitForElement([".LeftSidebar", ".LeftSidebar__section--rootlist .SidebarList__l
 
         for (let i = 0; i < sidebarItem.length; i++) {
             const item = sidebarItem[i];
-            const link = item.getElementsByTagName("a")[0];
-            const href = link.href.replace("app:", "");
+            let link = item.getElementsByTagName("a");
+            if (!link || !link[0]) continue;
+            link = link[0];
+
+            let href = link.href.replace("app:", "");
 
             if (href.indexOf("playlist-folder") != -1) {
                 const button = item.getElementsByTagName("button")[0]
@@ -35,6 +64,10 @@ waitForElement([".LeftSidebar", ".LeftSidebar__section--rootlist .SidebarList__l
                 item.setAttribute("data-tooltip", item.innerText);
                 link.firstChild.innerText = item.innerText.slice(0, 3);
                 continue;
+            }
+
+            if (href.indexOf("chart") != -1) {
+                href = href.replace("chart:", "user:spotifycharts:playlist:");
             }
 
             Spicetify.CosmosAPI.resolver.get({
@@ -54,7 +87,7 @@ waitForElement([".LeftSidebar", ".LeftSidebar__section--rootlist .SidebarList__l
 
     new MutationObserver(loadPlaylistImage)
         .observe(queries[1], {childList: true});
-    
+
     /** Replace Apps name with icons */
 
     /** List of avaiable icons to use:
@@ -80,6 +113,27 @@ waitForElement([".LeftSidebar", ".LeftSidebar__section--rootlist .SidebarList__l
     events              mix             skipback15
     */
 
+    function replaceTextWithIcon(el, iconName) {
+        const href = el.parentNode.href;
+        if (appHiddenList.indexOf(href) !== -1) {
+            let parent = el;
+            while (parent.tagName !== "LI") {
+                parent = parent.parentNode;
+            }
+            parent.remove();
+            return;
+        }
+
+        if (iconName) {
+            el.classList.add(`spoticon-${iconName}-24`);
+        }
+
+        el.parentNode.setAttribute("data-tooltip", el.innerText);
+        el.parentNode.setAttribute("data-contextmenu", "");
+        el.parentNode.setAttribute("data-uri", "spotify:special:sidebarapp:" + href);
+        el.innerText = "";
+    }
+
     queries[0].querySelectorAll(".LeftSidebar__section:not(.LeftSidebar__section--rootlist) [href]")
         .forEach(item => {
             let icon = ((app) => {switch (app) {
@@ -95,12 +149,21 @@ waitForElement([".LeftSidebar", ".LeftSidebar__section--rootlist .SidebarList__l
                 case "collection:podcasts":     return "podcasts";
                 case "playlist:local-files":    return "localfile";
                 case "stations":                return "stations";
+                /**
+                 * Uncomment 3 lines below if you're using old version of Spotify that
+                 * does not have Home/Browse/Radio app icons by default.
+                 */
+                //case "home":					return "home";
+                //case "browse":	                return "browse";
+                //case "radio":	                return "radio";
             }})(item.href.replace("spotify:app:", ""));
 
-            item.firstChild.classList.add(`spoticon-${icon}-24`);
-            item.firstChild.setAttribute("data-tooltip", item.firstChild.innerText);
-            item.firstChild.innerText = "";
+            replaceTextWithIcon(item.firstChild, icon);
         });
+
+    waitForElement([`[href="spotify:app:recently-played"]`], ([query]) => {
+        replaceTextWithIcon(query.firstChild, "time");
+    });
 });
 
 waitForElement(["#search-input"], (queries) => {
