@@ -1,9 +1,9 @@
 
 ### Download first
-[VSCode Deb](https://code.visualstudio.com/docs/?dv=linux64_deb)
-[Chrome Deb](https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb)
-[Discord Deb](https://discord.com/api/download?platform=linux&format=deb)
-[Steam Deb](https://cdn.akamai.steamstatic.com/client/installer/steam.deb)
+* [VSCode Deb](https://code.visualstudio.com/docs/?dv=linux64_deb)
+* [Chrome Deb](https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb)
+* [Discord Deb](https://discord.com/api/download?platform=linux&format=deb)
+* [Steam Deb](https://cdn.akamai.steamstatic.com/client/installer/steam.deb)
 
 ### General stuff
 ```bash
