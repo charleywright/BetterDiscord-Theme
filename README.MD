@@ -103,6 +103,8 @@ code --install-extension zhuangtongfa.material-theme
 code --install-extension pkief.material-icon-theme
 code --install-extension xabikos.javascriptsnippets
 code --install-extension icrawl.discord-vscode
+code --install-extension formulahendry.auto-rename-tag
+code --install-extension formulahendry.auto-close-tag
 code --install-extension ms-dotnettools.csharp # Only if you have already installed the dotnet CLI
 echo "{\"workbench.iconTheme\": \"material-icon-theme\",\"workbench.colorTheme\": \"One Dark Pro\"}" > ~/.config/Code/User/settings.json
 ```
