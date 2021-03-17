@@ -19,9 +19,9 @@ sudo dpkg -i steam*
 sudo dpkg -i discord*
 sudo apt --fix-broken install
 sudo dpkg -i discord*
-sudo add-apt-repository ppa:chronobserver/betterdiscordctl -y
-sudo apt update
-sudo apt install betterdiscordctl -y
+curl -O https://raw.githubusercontent.com/bb010g/betterdiscordctl/master/betterdiscordctl
+chmod +x betterdiscordctl
+sudo mv betterdiscordctl /usr/local/bin
 betterdiscordctl install
 git clone https://github.com/charleywright/Themes.git
 cp Themes/BetterDiscord/Themes/* ~/.config/BetterDiscord/themes/
