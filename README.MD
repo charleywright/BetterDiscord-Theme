@@ -145,3 +145,12 @@ sudo apt install docker-ce docker-ce-cli containerd.io
 # sudo groupadd docker
 sudo usermod -aG docker $USER
 ```
+
+
+### Doctl & kubectl
+```bash
+sudo snap install kubectl --classic
+sudo snap install doctl
+sudo snap connect doctl:kube-config
+sudo snap connect doctl:dot-docker
+```
