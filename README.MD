@@ -158,6 +158,6 @@ sudo snap connect doctl:dot-docker
 
 ### BetterGnome
 ```bash
-sudo apt install gnome-tweaks gnome-shell-extensions papirus-icon-theme -y
+sudo apt install gnome-tweaks gnome-shell-extensions papirus-icon-theme plank -y
 ```
-Install [User-themes](https://extensions.gnome.org/extension/19/user-themes/) [Dash to Dock](https://extensions.gnome.org/extension/307/dash-to-dock/)
+Install [User-themes](https://extensions.gnome.org/extension/19/user-themes/), [Dash to Dock](https://extensions.gnome.org/extension/307/dash-to-dock/)
