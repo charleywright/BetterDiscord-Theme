@@ -159,5 +159,10 @@ sudo snap connect doctl:dot-docker
 ### BetterGnome
 ```bash
 sudo apt install gnome-tweaks gnome-shell-extensions papirus-icon-theme plank -y
+mkdir -p ~/.themes
+wget "https://github.com/EliverLara/Nordic/releases/latest/download/Nordic-darker.tar.xz" -O ~/.themes/nordic-darker.tar.xz
+tar xf ~/.themes/nordic-darker.tar.xz -C ~/.themes/
+gsettings set org.gnome.desktop.wm.preferences theme Nordic-darker
+gsettings set org.gnome.desktop.interface gtk-theme Nordic-darker
 ```
 Install [User-themes](https://extensions.gnome.org/extension/19/user-themes/), [Dash to Dock](https://extensions.gnome.org/extension/307/dash-to-dock/)
