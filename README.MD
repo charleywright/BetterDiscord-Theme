@@ -155,3 +155,9 @@ sudo snap install doctl
 sudo snap connect doctl:kube-config
 sudo snap connect doctl:dot-docker
 ```
+
+### BetterGnome
+```bash
+sudo apt install gnome-tweaks gnome-shell-extensions papirus-icon-theme -y
+```
+Install [User-themes](https://extensions.gnome.org/extension/19/user-themes/)
