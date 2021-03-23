@@ -8,7 +8,7 @@
 ### General stuff
 ```bash
 cd ~/Downloads
-sudo apt install latte-dock git -y
+sudo apt install curl git -y
 sudo dpkg -i google-chrome-stable_current_amd64.deb code* steam*
 sudo apt --fix-broken install -y
 sudo dpkg -i steam*
