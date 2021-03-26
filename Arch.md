@@ -18,3 +18,9 @@ yay -S google-chrome --noconfirm
 > ~/.zshrc
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 ```
+
+### Terminator
+```bash
+sudo pacman -S terminator
+wget https://raw.githubusercontent.com/charleywright/Linux-Scripts/master/Terminator/config -O ~/.config/terminator/config
+```
