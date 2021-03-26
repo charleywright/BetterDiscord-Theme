@@ -1,0 +1,17 @@
+[global_config]
+[keybindings]
+[profiles]
+  [[default]]
+    background_color = "#2b303c"
+    cursor_color = "#aaaaaa"
+    show_titlebar = False
+[layouts]
+  [[default]]
+    [[[window]]]
+      type = Window
+      parent = ""
+      size = 1200, 600
+    [[[child1]]]
+      type = Terminal
+      parent = window0
+[plugins]
