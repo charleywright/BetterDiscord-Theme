@@ -6,3 +6,9 @@ git clone https://aur.archlinux.org/yay.git
 cd yay
 makepkg -si --noconfirm
 ```
+
+
+### Software
+```bash
+yay -S google-chrome --noconfirm
+```
