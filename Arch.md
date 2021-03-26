@@ -12,3 +12,9 @@ makepkg -si --noconfirm
 ```bash
 yay -S google-chrome --noconfirm
 ```
+
+### ZSH
+```bash
+> ~/.zshrc
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+```
