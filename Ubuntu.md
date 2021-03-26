@@ -155,6 +155,7 @@ sudo usermod -aG docker $USER
 ```bash
 sudo snap install kubectl --classic
 sudo snap install doctl
+mkdir ~/.kube
 sudo snap connect doctl:kube-config
 sudo snap connect doctl:dot-docker
 ```
