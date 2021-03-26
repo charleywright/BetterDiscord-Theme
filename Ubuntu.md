@@ -23,7 +23,7 @@ curl -O https://raw.githubusercontent.com/bb010g/betterdiscordctl/master/betterd
 chmod +x betterdiscordctl
 sudo mv betterdiscordctl /usr/local/bin
 betterdiscordctl install
-git clone https://github.com/charleywright/Themes.git
+git clone https://github.com/charleywright/Linux-Scripts.git
 cp Themes/BetterDiscord/Themes/* ~/.config/BetterDiscord/themes/
 cp Themes/BetterDiscord/Plugins/* ~/.config/BetterDiscord/plugins/
 rm -Rf Themes
@@ -41,7 +41,7 @@ sudo chmod a+wr /usr/share/spotify
 sudo chmod a+wr /usr/share/spotify/Apps -R
 curl -fsSL https://raw.githubusercontent.com/khanhas/spicetify-cli/master/install.sh | sh
 mkdir -p $(dirname "$(~/spicetify-cli/spicetify -c)")/Extensions
-git clone https://github.com/charleywright/Themes.git
+git clone https://github.com/charleywright/Linux-Scripts.git
 cp Themes/Spicetify/* "$(dirname "$(~/spicetify-cli/spicetify -c)")/Themes" -r
 cp "$(dirname "$(~/spicetify-cli/spicetify -c)")/Themes/Dribbblish/dribbblish.js" "$(dirname "$(~/spicetify-cli/spicetify -c)")/Extensions"
 ~/spicetify-cli/spicetify config extensions dribbblish.js
@@ -93,7 +93,7 @@ sudo apt install nodejs yarn -y
 
 ### VSCode
 ```bash
-wget https://raw.githubusercontent.com/charleywright/Themes/master/VSCode/Keybinds.json -O ~/.config/Code/User/keybindings.json
+wget https://raw.githubusercontent.com/charleywright/Linux-Scripts/master/VSCode/Keybinds.json -O ~/.config/Code/User/keybindings.json
 code --install-extension esbenp.prettier-vscode
 code --install-extension dbaeumer.vscode-eslint
 code --install-extension rvest.vs-code-prettier-eslint
