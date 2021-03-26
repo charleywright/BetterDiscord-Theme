@@ -23,10 +23,11 @@ curl -O https://raw.githubusercontent.com/bb010g/betterdiscordctl/master/betterd
 chmod +x betterdiscordctl
 sudo mv betterdiscordctl /usr/local/bin
 betterdiscordctl install
+mkdir -p ~/.config/BetterDiscord/plugins ~/.config/BetterDiscord/themes
 git clone https://github.com/charleywright/Linux-Scripts.git
-cp Themes/BetterDiscord/Themes/* ~/.config/BetterDiscord/themes/
-cp Themes/BetterDiscord/Plugins/* ~/.config/BetterDiscord/plugins/
-rm -Rf Themes
+cp Linux-Scripts/BetterDiscord/Themes/* ~/.config/BetterDiscord/themes/
+cp Linux-Scripts/BetterDiscord/Plugins/* ~/.config/BetterDiscord/plugins/
+rm -Rf Linux-Scripts
 ```
 
 ### Spicetify
