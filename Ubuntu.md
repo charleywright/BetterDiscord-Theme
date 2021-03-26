@@ -168,6 +168,7 @@ wget "https://github.com/EliverLara/Nordic/releases/latest/download/Nordic-darke
 tar xf ~/.themes/nordic-darker.tar.xz -C ~/.themes/
 gsettings set org.gnome.desktop.wm.preferences theme Nordic-darker
 gsettings set org.gnome.desktop.interface gtk-theme Nordic-darker
+dconf write /org/gnome/desktop/interface/text-scaling-factor 0.80
 ```
 
 #### Shell Extensions
