@@ -10,7 +10,7 @@ makepkg -si --noconfirm
 
 ### Software
 ```bash
-yay -S google-chrome neofetch wget curl spotify discord plank
+yay -S google-chrome neofetch wget curl spotify discord code
 ```
 
 ### Zsh/Oh My ZSH
@@ -33,11 +33,6 @@ sudo pacman -S terminator
 yay -S nerd-fonts-hack
 mkdir -p ~/.config/terminator/
 wget https://raw.githubusercontent.com/charleywright/Linux-Scripts/master/Terminator/config -O ~/.config/terminator/config
-```
-
-### Force Xorg instead of wayland
-```bash
-sudo sed -i -e 's/#WaylandEnable=false/WaylandEnable=false/g' /etc/gdm/custom.conf
 ```
 
 ### BetterGnome
