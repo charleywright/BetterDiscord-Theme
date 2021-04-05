@@ -35,6 +35,11 @@ mkdir -p ~/.config/terminator/
 wget https://raw.githubusercontent.com/charleywright/Linux-Scripts/master/Terminator/config -O ~/.config/terminator/config
 ```
 
+### Force Xorg instead of wayland
+```bash
+sudo sed -i -e 's/#WaylandEnable=false/WaylandEnable=false/g' /etc/gdm/custom.conf
+```
+
 ### BetterGnome
 ```bash
 yay -S gnome-shell-extensions gnome-tweaks
