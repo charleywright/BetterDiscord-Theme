@@ -7,7 +7,6 @@ cd yay
 makepkg -si --noconfirm
 ```
 
-
 ### Software
 ```bash
 yay -S google-chrome neofetch wget curl spotify discord dotnet-sdk docker
@@ -91,4 +90,19 @@ dconf write /org/gnome/shell/extensions/dash-to-dock/show-trash false
 dconf write /org/gnome/shell/extensions/dash-to-dock/custom-theme-shrink true
 dconf write /org/gnome/shell/extensions/dash-to-dock/transparency-mode "'FIXED'"
 dconf write /org/gnome/shell/extensions/dash-to-dock/background-opacity 0.0
+```
+
+### Snap, Doctl & Kubectl
+```bash
+yay -S snapd
+systemctl enable snapd.service
+systemctl start snapd.service
+sudo ln -s /var/lib/snapd/snap /snap
+```
+```bash
+sudo snap install kubectl --classic
+sudo snap install doctl
+mkdir ~/.kube
+sudo snap connect doctl:kube-config
+sudo snap connect doctl:dot-docker
 ```
