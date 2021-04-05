@@ -71,8 +71,7 @@ gsettings set org.gnome.desktop.interface gtk-theme Nordic-darker
 * [Transparent top bar](https://extensions.gnome.org/extension/3960/transparent-top-bar-adjustable-transparency/)
 * [User-themes](https://extensions.gnome.org/extension/19/user-themes/)
 
-### Dash to Dock
-* [Dash to Dock](https://extensions.gnome.org/extension/307/dash-to-dock/)
+### [Dash to Dock](https://extensions.gnome.org/extension/307/dash-to-dock/)
 ```bash
 dconf write /org/gnome/shell/extensions/dash-to-dock/preferred-monitor 0
 dconf write /org/gnome/shell/extensions/dash-to-dock/dock-position "'BOTTOM'"
