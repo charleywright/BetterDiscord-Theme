@@ -10,7 +10,7 @@ makepkg -si --noconfirm
 
 ### Software
 ```bash
-yay -S google-chrome neofetch wget curl spotify discord code
+yay -S google-chrome neofetch wget curl spotify discord
 ```
 
 ### Zsh/Oh My ZSH
@@ -33,6 +33,26 @@ sudo pacman -S terminator
 yay -S nerd-fonts-hack
 mkdir -p ~/.config/terminator/
 wget https://raw.githubusercontent.com/charleywright/Linux-Scripts/master/Terminator/config -O ~/.config/terminator/config
+```
+
+### VSCode
+```bash
+yay -S code
+wget https://raw.githubusercontent.com/charleywright/Linux-Scripts/master/VSCode/Keybinds.json -O ~/.config/Code/User/keybindings.json
+code --install-extension esbenp.prettier-vscode
+code --install-extension dbaeumer.vscode-eslint
+code --install-extension rvest.vs-code-prettier-eslint
+code --install-extension ritwickdey.liveserver
+code --install-extension octref.vetur
+code --install-extension vuetifyjs.vuetify-vscode
+code --install-extension zhuangtongfa.material-theme
+code --install-extension pkief.material-icon-theme
+code --install-extension xabikos.javascriptsnippets
+code --install-extension icrawl.discord-vscode
+code --install-extension formulahendry.auto-rename-tag
+code --install-extension formulahendry.auto-close-tag
+code --install-extension ms-dotnettools.csharp # Only if you have already installed the dotnet CLI
+echo "{\"workbench.iconTheme\": \"material-icon-theme\",\"workbench.colorTheme\": \"One Dark Pro\"}" > ~/.config/Code/User/settings.json
 ```
 
 ### BetterGnome
