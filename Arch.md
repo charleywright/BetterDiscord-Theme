@@ -32,6 +32,7 @@ wget https://raw.githubusercontent.com/charleywright/Linux-Scripts/master/Termin
 yay -S gnome-shell-extensions gnome-tweaks
 sudo pacman -Sy papirus-icon-theme chrome-gnome-shell
 dconf write /com/ftpix/transparentbar/transparency 0
+dconf write /org/gnome/desktop/interface/icon-theme "'Papirus-Dark'"
 ```
 * [Transparent top bar](https://extensions.gnome.org/extension/3960/transparent-top-bar-adjustable-transparency/)
 * [User-themes](https://extensions.gnome.org/extension/19/user-themes/)
