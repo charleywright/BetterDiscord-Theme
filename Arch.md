@@ -10,7 +10,7 @@ makepkg -si --noconfirm
 
 ### Software
 ```bash
-yay -S google-chrome gnome-shell-extensions gnome-tweaks neofetch wget curl spotify
+yay -S google-chrome neofetch wget curl spotify
 ```
 
 ### ZSH
@@ -26,3 +26,12 @@ yay -S nerd-fonts-hack
 mkdir -p ~/.config/terminator/
 wget https://raw.githubusercontent.com/charleywright/Linux-Scripts/master/Terminator/config -O ~/.config/terminator/config
 ```
+
+### BetterGnome
+```bash
+yay -S gnome-shell-extensions gnome-tweaks
+sudo pacman -S chrome-gnome-shell
+```
+* [Transparent top bar](https://extensions.gnome.org/extension/3960/transparent-top-bar-adjustable-transparency/)
+* [User-themes](https://extensions.gnome.org/extension/19/user-themes/)
+* [Dash to Dock](https://extensions.gnome.org/extension/307/dash-to-dock/)
