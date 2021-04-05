@@ -33,6 +33,7 @@ yay -S gnome-shell-extensions gnome-tweaks
 sudo pacman -S papirus-icon-theme chrome-gnome-shell
 dconf write /com/ftpix/transparentbar/transparency 0
 dconf write /org/gnome/desktop/interface/icon-theme "'Papirus-Dark'"
+dconf write /org/gnome/desktop/interface/text-scaling-factor 0.80
 mkdir -p ~/.themes
 wget "https://github.com/EliverLara/Nordic/releases/latest/download/Nordic-darker.tar.xz" -O ~/.themes/nordic-darker.tar.xz
 tar xf ~/.themes/nordic-darker.tar.xz -C ~/.themes/
