@@ -35,6 +35,14 @@ mkdir -p ~/.config/terminator/
 wget https://raw.githubusercontent.com/charleywright/Linux-Scripts/master/Terminator/config -O ~/.config/terminator/config
 ```
 
+### Nodejs
+```bash
+yay -S nodejs npm
+mkdir ~/npm
+npm config set prefix ~/npm
+echo "export PATH=\"$PATH:$HOME/npm/bin\"" >> ~/.zshrc
+```
+
 ### VSCode
 ```bash
 yay -S code
