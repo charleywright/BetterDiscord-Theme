@@ -10,7 +10,7 @@ makepkg -si --noconfirm
 
 ### Software
 ```bash
-yay -S google-chrome gnome-shell-extensions gnome-tweaks neofetch wget curl --noconfirm
+yay -S google-chrome gnome-shell-extensions gnome-tweaks neofetch wget curl spotify
 ```
 
 ### ZSH
