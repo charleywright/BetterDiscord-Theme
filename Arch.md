@@ -15,7 +15,7 @@ yay -S google-chrome gnome-shell-extensions gnome-tweaks neofetch --noconfirm
 
 ### ZSH
 ```bash
-> ~/.zshrc
+sudo pacman -Sy zsh
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 ```
 
