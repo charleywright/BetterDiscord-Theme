@@ -9,7 +9,7 @@ makepkg -si --noconfirm
 
 ### Software
 ```bash
-yay -S google-chrome neofetch wget curl spotify discord dotnet-sdk docker
+yay -S google-chrome neofetch wget curl spotify discord dotnet-sdk docker vlc ntfs-3g
 sudo usermod -aG docker $USER
 ```
 
