@@ -10,7 +10,8 @@ makepkg -si --noconfirm
 
 ### Software
 ```bash
-yay -S google-chrome neofetch wget curl spotify discord dotnet-sdk
+yay -S google-chrome neofetch wget curl spotify discord dotnet-sdk docker
+sudo usermod -aG docker $USER
 ```
 
 ### Zsh/Oh My ZSH
