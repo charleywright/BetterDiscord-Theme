@@ -1,4 +1,5 @@
 [global_config]
+  inactive_color_offset = 1.0
   title_use_system_font = False
   title_font = Hack Nerd Font Mono 10
 [keybindings]
