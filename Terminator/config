@@ -1,10 +1,16 @@
 [global_config]
+  title_use_system_font = False
+  title_font = Hack Nerd Font Mono 10
 [keybindings]
 [profiles]
   [[default]]
     background_color = "#2b303c"
     cursor_color = "#aaaaaa"
+    font = Hack Nerd Font Mono 11
     show_titlebar = False
+    scrollbar_position = hidden
+    palette = "#2b303c:#cc0000:#4e9a06:#c4a000:#3465a4:#75507b:#06989a:#d3d7cf:#2b303c:#ef2929:#8ae234:#fce94f:#729fcf:#ad7fa8:#34e2e2:#eeeeec"
+    use_system_font = False
 [layouts]
   [[default]]
     [[[window]]]
