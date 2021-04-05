@@ -33,6 +33,11 @@ yay -S gnome-shell-extensions gnome-tweaks
 sudo pacman -Sy papirus-icon-theme chrome-gnome-shell
 dconf write /com/ftpix/transparentbar/transparency 0
 dconf write /org/gnome/desktop/interface/icon-theme "'Papirus-Dark'"
+mkdir -p ~/.themes
+wget "https://github.com/EliverLara/Nordic/releases/latest/download/Nordic-darker.tar.xz" -O ~/.themes/nordic-darker.tar.xz
+tar xf ~/.themes/nordic-darker.tar.xz -C ~/.themes/
+gsettings set org.gnome.desktop.wm.preferences theme Nordic-darker
+gsettings set org.gnome.desktop.interface gtk-theme Nordic-darker
 ```
 * [Transparent top bar](https://extensions.gnome.org/extension/3960/transparent-top-bar-adjustable-transparency/)
 * [User-themes](https://extensions.gnome.org/extension/19/user-themes/)
