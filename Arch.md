@@ -30,7 +30,7 @@ wget https://raw.githubusercontent.com/charleywright/Linux-Scripts/master/Termin
 ### BetterGnome
 ```bash
 yay -S gnome-shell-extensions gnome-tweaks
-sudo pacman -S chrome-gnome-shell
+sudo pacman -Sy papirus-icon-theme chrome-gnome-shell
 dconf write /com/ftpix/transparentbar/transparency 0
 ```
 * [Transparent top bar](https://extensions.gnome.org/extension/3960/transparent-top-bar-adjustable-transparency/)
