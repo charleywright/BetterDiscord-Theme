@@ -98,6 +98,7 @@ yay -S snapd
 systemctl enable snapd.service
 systemctl start snapd.service
 sudo ln -s /var/lib/snapd/snap /snap
+echo "export PATH=\"$PATH:/snap/bin\"" >> ~/.zshrc
 ```
 ```bash
 sudo snap install kubectl --classic
@@ -105,4 +106,7 @@ sudo snap install doctl
 mkdir ~/.kube
 sudo snap connect doctl:kube-config
 sudo snap connect doctl:dot-docker
+```
+```bash
+doctl auth init
 ```
