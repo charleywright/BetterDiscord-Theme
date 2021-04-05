@@ -109,4 +109,6 @@ sudo snap connect doctl:dot-docker
 ```
 ```bash
 doctl auth init
+doctl registry login
+doctl kubernetes cluster kubeconfig save CLUSTER_ID
 ```
