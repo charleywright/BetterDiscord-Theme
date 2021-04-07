@@ -10,6 +10,7 @@ makepkg -si --noconfirm
 ### Software
 ```bash
 yay -S google-chrome neofetch wget curl spotify discord dotnet-sdk docker vlc ntfs-3g
+sudo pacman -S noto-fonts noto-fonts-extra noto-fonts-emoji noto-fonts-cjk
 sudo usermod -aG docker $USER
 ```
 
