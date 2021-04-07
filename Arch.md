@@ -72,6 +72,10 @@ echo "{\"workbench.iconTheme\": \"material-icon-theme\",\"workbench.colorTheme\"
 
 ### BetterGnome
 ```bash
+sudo sed -i "s/#WaylandEnable=false/WaylandEnable=false/g" /etc/gdm/custom.conf
+sudo systemctl restart gdm
+```
+```bash
 yay -S gnome-shell-extensions gnome-tweaks
 sudo pacman -S papirus-icon-theme chrome-gnome-shell
 dconf write /com/ftpix/transparentbar/transparency 0
