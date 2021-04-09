@@ -14,7 +14,7 @@ sudo sed -i "$multilib s/^#//g" /etc/pacman.conf
 local multilib=$(( $multilib + 1 ))
 sudo sed -i "$multilib s/^#//g" /etc/pacman.conf
 sudo pacman -Sy
-yay -S google-chrome neofetch wget curl spotify discord dotnet-sdk docker vlc ntfs-3g steam steam-fonts
+yay -S google-chrome neofetch wget curl spotify discord dotnet-sdk docker vlc ntfs-3g steam steam-fonts appimagelauncher
 sudo pacman -S noto-fonts noto-fonts-extra noto-fonts-emoji noto-fonts-cjk
 sudo usermod -aG docker $USER
 ```
