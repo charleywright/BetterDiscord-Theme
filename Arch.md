@@ -20,7 +20,7 @@ sudo usermod -aG docker $USER
 
 ### Zsh/Oh My ZSH
 ```bash
-sudo pacman -S zsh
+sudo yay -S zsh
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 ```
 ```bash
@@ -34,8 +34,7 @@ source ~/.zshrc
 
 ### Terminator
 ```bash
-sudo pacman -S terminator
-yay -S nerd-fonts-hack
+yay -S terminator nerd-fonts-hack
 mkdir -p ~/.config/terminator/
 wget https://raw.githubusercontent.com/charleywright/Linux-Scripts/master/Terminator/config -O ~/.config/terminator/config
 ```
@@ -75,8 +74,7 @@ sudo sed -i "s/#WaylandEnable=false/WaylandEnable=false/g" /etc/gdm/custom.conf
 sudo systemctl restart gdm
 ```
 ```bash
-yay -S gnome-shell-extensions gnome-tweaks
-sudo pacman -S papirus-icon-theme chrome-gnome-shell
+yay -S gnome-shell-extensions gnome-tweaks papirus-icon-theme chrome-gnome-shell
 dconf write /com/ftpix/transparentbar/transparency 0
 dconf write /org/gnome/desktop/interface/icon-theme "'Papirus-Dark'"
 dconf write /org/gnome/desktop/interface/text-scaling-factor 0.80
