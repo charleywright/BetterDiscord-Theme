@@ -83,6 +83,7 @@ wget "https://github.com/EliverLara/Nordic/releases/latest/download/Nordic-darke
 tar xf ~/.themes/nordic-darker.tar.xz -C ~/.themes/
 gsettings set org.gnome.desktop.wm.preferences theme Nordic-darker
 gsettings set org.gnome.desktop.interface gtk-theme Nordic-darker
+gsettings set org.gnome.shell disable-extension-version-validation "true"
 ```
 * [Transparent top bar](https://extensions.gnome.org/extension/3960/transparent-top-bar-adjustable-transparency/)
 * [User-themes](https://extensions.gnome.org/extension/19/user-themes/)
