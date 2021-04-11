@@ -123,3 +123,10 @@ doctl auth init
 doctl registry login
 doctl kubernetes cluster kubeconfig save CLUSTER_ID
 ```
+
+### Flatpak & Hydrapaper
+```bash
+yay -S flatpak
+flatpak install org.gabmus.hydrapaper
+flatpak run org.gabmus.hydrapaper
+```
