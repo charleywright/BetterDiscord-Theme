@@ -1,12 +1,15 @@
 /**
  * @name BadgesEverywhere
+ * @author DevilBro
  * @authorId 278543574059057154
+ * @version 1.6.6
+ * @description Displays Badges (Nitro, Hypesquad, etc...) in the Chat/MemberList/UserPopout
  * @invite Jx3TjNS
  * @donate https://www.paypal.me/MircoWittrien
  * @patreon https://www.patreon.com/MircoWittrien
- * @website https://github.com/mwittrien/BetterDiscordAddons/tree/master/Plugins/BadgesEverywhere
- * @source https://raw.githubusercontent.com/mwittrien/BetterDiscordAddons/master/Plugins/BadgesEverywhere/BadgesEverywhere.plugin.js
- * @updateUrl https://raw.githubusercontent.com/mwittrien/BetterDiscordAddons/master/Plugins/BadgesEverywhere/BadgesEverywhere.plugin.js
+ * @website https://mwittrien.github.io/
+ * @source https://github.com/mwittrien/BetterDiscordAddons/tree/master/Plugins/BadgesEverywhere/
+ * @updateUrl https://mwittrien.github.io/BetterDiscordAddons/Plugins/BadgesEverywhere/BadgesEverywhere.plugin.js
  */
 
 module.exports = (_ => {
@@ -14,20 +17,23 @@ module.exports = (_ => {
 		"info": {
 			"name": "BadgesEverywhere",
 			"author": "DevilBro",
-			"version": "1.6.5",
-			"description": "Display Badges (Nitro, HypeSquad, etc...) in the chat/memberlist/userpopout"
-		},
-		"changeLog": {
-			"fixed": {
-				"Styling Replies": "Fixed position and margins for badges in replied messages"
-			}
+			"version": "1.6.6",
+			"description": "Displays Badges (Nitro, Hypesquad, etc...) in the Chat/MemberList/UserPopout"
 		}
 	};
+	
 	return !window.BDFDB_Global || (!window.BDFDB_Global.loaded && !window.BDFDB_Global.started) ? class {
 		getName () {return config.info.name;}
 		getAuthor () {return config.info.author;}
 		getVersion () {return config.info.version;}
-		getDescription () {return `The Library Plugin needed for ${config.info.name} is missing. Open the Plugin Settings to download it.\n\n${config.info.description}`;}
+		getDescription () {return `The Library Plugin needed for ${config.info.name} is missing. Open the Plugin Settings to download it. \n\n${config.info.description}`;}
+		
+		downloadLibrary () {
+			require("request").get("https://mwittrien.github.io/BetterDiscordAddons/Library/0BDFDB.plugin.js", (e, r, b) => {
+				if (!e && b && r.statusCode == 200) require("fs").writeFile(require("path").join(BdApi.Plugins.folder, "0BDFDB.plugin.js"), b, _ => BdApi.showToast("Finished downloading BDFDB Library", {type: "success"}));
+				else BdApi.alert("Error", "Could not download BDFDB Library Plugin. Try again later or download it manually from GitHub: https://mwittrien.github.io/downloader/?library");
+			});
+		}
 		
 		load () {
 			if (!window.BDFDB_Global || !Array.isArray(window.BDFDB_Global.pluginQueue)) window.BDFDB_Global = Object.assign({}, window.BDFDB_Global, {pluginQueue: []});
@@ -39,10 +45,7 @@ module.exports = (_ => {
 					onCancel: _ => {delete window.BDFDB_Global.downloadModal;},
 					onConfirm: _ => {
 						delete window.BDFDB_Global.downloadModal;
-						require("request").get("https://mwittrien.github.io/BetterDiscordAddons/Library/0BDFDB.plugin.js", (e, r, b) => {
-							if (!e && b && b.indexOf(`* @name BDFDB`) > -1) require("fs").writeFile(require("path").join(BdApi.Plugins.folder, "0BDFDB.plugin.js"), b, _ => {});
-							else BdApi.alert("Error", "Could not download BDFDB Library Plugin, try again later or download it manually from GitHub: https://github.com/mwittrien/BetterDiscordAddons/tree/master/Library/");
-						});
+						this.downloadLibrary();
 					}
 				});
 			}
@@ -53,12 +56,7 @@ module.exports = (_ => {
 		getSettingsPanel () {
 			let template = document.createElement("template");
 			template.innerHTML = `<div style="color: var(--header-primary); font-size: 16px; font-weight: 300; white-space: pre; line-height: 22px;">The Library Plugin needed for ${config.info.name} is missing.\nPlease click <a style="font-weight: 500;">Download Now</a> to install it.</div>`;
-			template.content.firstElementChild.querySelector("a").addEventListener("click", _ => {
-				require("request").get("https://mwittrien.github.io/BetterDiscordAddons/Library/0BDFDB.plugin.js", (e, r, b) => {
-					if (!e && b && b.indexOf(`* @name BDFDB`) > -1) require("fs").writeFile(require("path").join(BdApi.Plugins.folder, "0BDFDB.plugin.js"), b, _ => {});
-					else BdApi.alert("Error", "Could not download BDFDB Library Plugin, try again later or download it manually from GitHub: https://github.com/mwittrien/BetterDiscordAddons/tree/master/Library/");
-				});
-			});
+			template.content.firstElementChild.querySelector("a").addEventListener("click", this.downloadLibrary);
 			return template.content.firstElementChild;
 		}
 	} : (([Plugin, BDFDB]) => {
@@ -359,7 +357,7 @@ module.exports = (_ => {
 					keys: ["badges", flag],
 					label: this.defaults.badges[flag].name + (this.defaults.badges[flag].suffix ? ` ${this.defaults.badges[flag].suffix}` : ""),
 					value: badges[flag],
-					labelchildren: this.createSettingsBadges(flag)
+					labelChildren: this.createSettingsBadges(flag)
 				}));
 				for (let flag in indicators) innerItems.push(BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.SettingsSaveItem, {
 					type: "Switch",
@@ -367,7 +365,7 @@ module.exports = (_ => {
 					keys: ["indicators", flag],
 					label: this.defaults.indicators[flag].name + (this.defaults.indicators[flag].suffix ? ` ${this.defaults.indicators[flag].suffix}` : ""),
 					value: indicators[flag],
-					labelchildren: this.createSettingsBadges(flag)
+					labelChildren: this.createSettingsBadges(flag)
 				}));
 				settingsItems.push(BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.SettingsPanelList, {
 					title: "Display Badges:",

@@ -41,16 +41,16 @@ module.exports = (() => {
           twitter_username: ''
         }
       ],
-      version: '1.0.9',
+      version: '1.0.11',
       description: 'Hold delete and click a message to delete it quickly.',
       github: 'https://github.com/1Lighty',
       github_raw: 'https://gitlab.com/_Lighty_/bdstuff/-/raw/master/public/plugins/QuickDeleteMessages.plugin.js'
     },
     changelog: [
       {
-        title: 'fixed what zere broke',
+        title: 'Fixed',
         type: 'added',
-        items: ['Fixed incorrect permissions checking, again']
+        items: ['Ghetto Powercord fix']
       }
     ],
     defaultConfig: [
@@ -84,7 +84,25 @@ module.exports = (() => {
     const { ContextMenu, EmulatedTooltip, Toasts, Settings, Popouts, Modals, Utilities, WebpackModules, Filters, DiscordModules, ColorConverter, DOMTools, DiscordClasses, DiscordSelectors, ReactTools, ReactComponents, DiscordAPI, Logger, Patcher, PluginUpdater, PluginUtilities, DiscordClassModules, Structs } = Api;
     const { React, ModalStack, ContextMenuActions, ContextMenuItem, ContextMenuItemsGroup, ReactDOM, ChannelStore, GuildStore, UserStore, DiscordConstants, Dispatcher, GuildMemberStore, GuildActions, SwitchRow, EmojiUtils, RadioGroup, FlexChild, PopoutOpener, Textbox } = DiscordModules;
 
-    const Permissions = WebpackModules.getByProps('can', 'getState');
+    const Permissions = WebpackModules.getByProps('can', 'initialize');
+
+    const cssPath = function(el) {
+      if (!(el instanceof Element)) return;
+      const path = [];
+      while (el.nodeType === Node.ELEMENT_NODE) {
+        let selector = el.nodeName.toLowerCase();
+        if (el.id) selector += `#${el.id}`;
+        else {
+          let sib = el, nth = 1;
+          while (sib.nodeType === Node.ELEMENT_NODE && (sib = sib.previousSibling) && nth++);
+          selector += `:nth-child(${nth})`;
+        }
+        path.unshift(selector);
+        el = el.parentNode;
+        if (el.id === 'app-mount') break;
+      }
+      return path.join(' > ');
+    };
 
     return class QuickDeleteMessages extends Plugin {
       constructor() {
@@ -120,10 +138,11 @@ module.exports = (() => {
           'click',
           (this.clickListener = e => {
             if (this.settings.misc.ctrlClickDelete ? !e.ctrlKey : !this.deleteKeyDown) return;
-            let target = e.target;
+            let { target } = e;
             while (target && (!target.classList || !target.classList.contains(messageClassname))) target = target.parentElement;
             if (!target) return;
-            const instance = ReactTools.getOwnerInstance(target.querySelector('.' + containerClassname));
+            console.log(cssPath(target.querySelector(`.${ containerClassname}`)));
+            const instance = ReactTools.getOwnerInstance(document.querySelector(cssPath(target.querySelector(`.${ containerClassname}`))));
             if (!instance || !instance.props || !instance.props.message) return;
             if (!this.canDelete(instance.props)) return;
             this.settings.misc.confirmDelete && !e.shiftKey ? this.tools.confirmDelete(instance.props.channel, instance.props.message, true) : this.tools.deleteMessage(instance.props.channel.id, instance.props.message.id);
@@ -195,7 +214,7 @@ module.exports = (() => {
 
   let ZeresPluginLibraryOutdated = false;
   try {
-    if (global.BdApi && BdApi.Plugins && 'function' == typeof BdApi.Plugins.get) {
+    if (global.BdApi && BdApi.Plugins && typeof BdApi.Plugins.get === 'function') {
       const a = (c, a) => ((c = c.split('.').map(b => parseInt(b))), (a = a.split('.').map(b => parseInt(b))), !!(a[0] > c[0])) || !!(a[0] == c[0] && a[1] > c[1]) || !!(a[0] == c[0] && a[1] == c[1] && a[2] > c[2]),
         b = BdApi.Plugins.get('ZeresPluginLibrary');
       ((b, c) => b && b._config && b._config.info && b._config.info.version && a(b._config.info.version, c))(b, '1.2.18') && (ZeresPluginLibraryOutdated = !0);
@@ -220,11 +239,15 @@ module.exports = (() => {
         return this.version;
       }
       getDescription() {
-        return this.description + ' You are missing ZeresPluginLibrary for this plugin, please enable the plugin and click Download Now.';
+        return `${this.description } You are missing ZeresPluginLibrary for this plugin, please enable the plugin and click Download Now.`;
       }
       stop() { }
-      start() { this.handleMissingLib(); }
-      load() { this.handleMissingLib(); }
+      start() {
+        this.handleMissingLib();
+      }
+      load() {
+        this.handleMissingLib();
+      }
       handleMissingLib() {
         const a = BdApi.findModuleByProps('openModal', 'hasModalOpen');
         if (a && a.hasModalOpen(`${this.name}_DEP_MODAL`)) return;
@@ -233,14 +256,14 @@ module.exports = (() => {
           d = `The Library ZeresPluginLibrary required for ${this.name} is ${ZeresPluginLibraryOutdated ? 'outdated' : 'missing'}.`,
           e = BdApi.findModuleByDisplayName('Text'),
           f = BdApi.findModuleByDisplayName('ConfirmModal'),
-          g = () => BdApi.alert(c, BdApi.React.createElement('span', {}, BdApi.React.createElement('div', {}, d), `Due to a slight mishap however, you'll have to download the libraries yourself. This is not intentional, something went wrong, errors are in console.`, b || ZeresPluginLibraryOutdated ? BdApi.React.createElement('div', {}, BdApi.React.createElement('a', { href: 'https://betterdiscord.net/ghdl?id=2252', target: '_blank' }, 'Click here to download ZeresPluginLibrary')) : null));
+          g = () => BdApi.alert(c, BdApi.React.createElement('span', {}, BdApi.React.createElement('div', {}, d), 'Due to a slight mishap however, you\'ll have to download the libraries yourself. This is not intentional, something went wrong, errors are in console.', b || ZeresPluginLibraryOutdated ? BdApi.React.createElement('div', {}, BdApi.React.createElement('a', { href: 'https://betterdiscord.net/ghdl?id=2252', target: '_blank' }, 'Click here to download ZeresPluginLibrary')) : null));
         if (!a || !f || !e) return console.error(`Missing components:${(a ? '' : ' ModalStack') + (f ? '' : ' ConfirmationModalComponent') + (e ? '' : 'TextElement')}`), g();
         class h extends BdApi.React.PureComponent {
           constructor(a) {
             super(a), (this.state = { hasError: !1 });
           }
           componentDidCatch(a) {
-            console.error(`Error in ${this.props.label}, screenshot or copy paste the error above to Lighty for help.`), this.setState({ hasError: !0 }), 'function' == typeof this.props.onError && this.props.onError(a);
+            console.error(`Error in ${this.props.label}, screenshot or copy paste the error above to Lighty for help.`), this.setState({ hasError: !0 }), typeof this.props.onError === 'function' && this.props.onError(a);
           }
           render() {
             return this.state.hasError ? null : this.props.children;
@@ -262,33 +285,31 @@ module.exports = (() => {
                 },
                 BdApi.React.createElement(
                   f,
-                  Object.assign(
-                    {
-                      header: c,
-                      children: BdApi.React.createElement(e, { size: e.Sizes.SIZE_16, children: [`${d} Please click Download Now to download it.`] }),
-                      red: !1,
-                      confirmText: 'Download Now',
-                      cancelText: 'Cancel',
-                      onCancel: b.onClose,
-                      onConfirm: () => {
-                        if (i) return;
-                        i = !0;
-                        const b = require('request'),
-                          c = require('fs'),
-                          d = require('path');
-                        b('https://raw.githubusercontent.com/rauenzi/BDPluginLibrary/master/release/0PluginLibrary.plugin.js', (b, e, f) => {
-                          try {
-                            if (b || 200 !== e.statusCode) return a.closeModal(k), g();
-                            c.writeFile(d.join(BdApi.Plugins && BdApi.Plugins.folder ? BdApi.Plugins.folder : window.ContentManager.pluginsFolder, '0PluginLibrary.plugin.js'), f, () => { });
-                          } catch (b) {
-                            console.error('Fatal error downloading ZeresPluginLibrary', b), a.closeModal(k), g();
-                          }
-                        });
-                      }
+                  {
+                    header: c,
+                    children: BdApi.React.createElement(e, { size: e.Sizes.SIZE_16, children: [`${d} Please click Download Now to download it.`] }),
+                    red: !1,
+                    confirmText: 'Download Now',
+                    cancelText: 'Cancel',
+                    onCancel: b.onClose,
+                    onConfirm: () => {
+                      if (i) return;
+                      i = !0;
+                      const b = require('request'),
+                        c = require('fs'),
+                        d = require('path');
+                      b('https://raw.githubusercontent.com/rauenzi/BDPluginLibrary/master/release/0PluginLibrary.plugin.js', (b, e, f) => {
+                        try {
+                          if (b || e.statusCode !== 200) return a.closeModal(k), g();
+                          c.writeFile(d.join(BdApi.Plugins && BdApi.Plugins.folder ? BdApi.Plugins.folder : window.ContentManager.pluginsFolder, '0PluginLibrary.plugin.js'), f, () => { });
+                        } catch (b) {
+                          console.error('Fatal error downloading ZeresPluginLibrary', b), a.closeModal(k), g();
+                        }
+                      });
                     },
-                    b,
-                    { onClose: () => { } }
-                  )
+                    ...b,
+                    onClose: () => { }
+                  }
                 )
               );
             } catch (b) {
