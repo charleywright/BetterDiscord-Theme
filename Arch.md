@@ -74,7 +74,7 @@ sudo sed -i "s/#WaylandEnable=false/WaylandEnable=false/g" /etc/gdm/custom.conf
 sudo systemctl restart gdm
 ```
 ```bash
-yay -S gnome-shell-extensions gnome-tweaks papirus-icon-theme chrome-gnome-shell
+yay -S gnome-shell-extensions gnome-tweaks papirus-icon-theme chrome-gnome-shell filemanager-actions
 dconf write /com/ftpix/transparentbar/transparency 0
 dconf write /org/gnome/desktop/interface/icon-theme "'Papirus-Dark'"
 dconf write /org/gnome/desktop/interface/text-scaling-factor 0.80
