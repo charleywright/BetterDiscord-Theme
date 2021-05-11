@@ -1,5 +1,6 @@
 ### Yay
 ```bash
+sudo pacman -S git
 cd ~/Downloads
 sudo pacman -S --needed base-devel --noconfirm
 git clone https://aur.archlinux.org/yay.git
