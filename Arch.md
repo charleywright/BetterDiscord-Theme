@@ -10,9 +10,9 @@ makepkg -si --noconfirm
 
 ### Software
 ```bash
-local multilib=`grep -n "\[multilib\]" /etc/pacman.conf | cut -f1 -d:`
+multilib=`grep -n "\[multilib\]" /etc/pacman.conf | cut -f1 -d:`
 sudo sed -i "$multilib s/^#//g" /etc/pacman.conf
-local multilib=$(( $multilib + 1 ))
+multilib=$(( $multilib + 1 ))
 sudo sed -i "$multilib s/^#//g" /etc/pacman.conf
 sudo pacman -Sy
 yay -S google-chrome neofetch wget curl spotify discord dotnet-sdk docker vlc ntfs-3g steam steam-fonts appimagelauncher alsa-firmware sof-firmware alsa-ucm-conf libappindicator-gtk3 noto-fonts noto-fonts-extra noto-fonts-emoji noto-fonts-cjk plank
