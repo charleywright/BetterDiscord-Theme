@@ -86,11 +86,11 @@ gsettings set org.gnome.desktop.wm.preferences theme Nordic-darker
 gsettings set org.gnome.desktop.interface gtk-theme Nordic-darker
 gsettings set org.gnome.shell disable-extension-version-validation "true"
 gsettings set org.gnome.desktop.peripherals.touchpad click-method areas
+gsettings set org.gnome.desktop.interface enable-hot-corners false
 ```
 * [Transparent top bar](https://extensions.gnome.org/extension/3960/transparent-top-bar-adjustable-transparency/)
 * [User-themes](https://extensions.gnome.org/extension/19/user-themes/)
 * [KStatusNotifierItem/AppIndicator Support](https://extensions.gnome.org/extension/615/appindicator-support/)
-* [No Topleft Hot Corner](https://extensions.gnome.org/extension/118/no-topleft-hot-corner/)
 
 ### [Dash to Dock](https://extensions.gnome.org/extension/307/dash-to-dock/)
 ```bash
