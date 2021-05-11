@@ -107,6 +107,12 @@ dconf write /org/gnome/shell/extensions/dash-to-dock/transparency-mode "'FIXED'"
 dconf write /org/gnome/shell/extensions/dash-to-dock/background-opacity 0.0
 ```
 
+### Correct monitor config on Gnome login screen
+```bash
+sudo cp -v ~/.config/monitors.xml /var/lib/gdm/.config/
+sudo chown gdm:gdm /var/lib/gdm/.config/monitors.xml
+```
+
 ### Snap, Doctl & Kubectl
 ```bash
 yay -S snapd
