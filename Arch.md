@@ -1,3 +1,127 @@
+[Skip to software](#software)
+
+# Setup, Mostly from [ItsFoss Guide](https://itsfoss.com/install-arch-linux/) {#setup}
+### Set keyboard layout for setup
+```bash
+ls /usr/share/kbd/keymaps/**/*.map.gz           # List all keyboard layouts
+loadkeys uk
+```
+
+### Partition Disk
+```bash
+fdisk -l                                        # List disks
+fdisk /dev/nvme0n1                              # My disk, yours might be different
+  # Delete all partitions, repeat for every partition on the disk, Windows normally has 4, Linux normally has 2 or 3
+  d
+  
+  # Create EFI partition
+  n
+  Leave as Default
+  Leave as Default
+  +512M
+  Y
+  
+  # Change partition type to EFI System
+  t
+  1
+  
+  # Create root partition (no home or swap because it's easier)
+  n
+  Leave as Default
+  Leave as Default
+  Leave as Default
+  
+  # Write to disk
+  w
+```
+
+### Create filesystem. Partitions might be different
+```bash
+mkfs.fat -F32 /dev/nvme0n1p1
+mkfs.ext4 /dev/nvme0n1p2
+```
+
+### Connect to WiFi. This is a lot of effort, I recommend using powerline because it is WAY easier and faster
+* [WiFi](https://wiki.archlinux.org/title/Iwd#iwctl)
+* [Mobile Broadband](https://wiki.archlinux.org/title/Mobile_broadband_modem#ModemManager)
+
+### Update mirrors for your location
+```bash
+pacman -Syy
+pacman -S reflector --noconfirm
+cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak                # Backup incase something goes wrong
+reflector -c "GB" -f 12 -l 10 -n 12 --save /etc/pacman.d/mirrorlist
+```
+
+### Install Arch. Partition might be different, should be the ext4 (2nd) partition
+```bash
+mount /dev/nvme0n1p2 /mnt
+pacstrap /mnt base linux linux-firmware vim nano
+```
+
+### Configure
+```bash
+genfstab -U /mnt >> /mnt/etc/fstab
+arch-chroot /mnt
+```
+
+### Timezone
+```bash
+timedatectl list-timezones
+timedatectl set-timezone Europe/London
+```
+
+### Locale
+```bash
+# Either open the file in nano or use `sed` to uncomment your locale
+less /etc/locale.gen
+sed -i -e 's/#en_GB.UTF-8/en_GB.UTF-8'/'
+
+# Generate Config
+locale-gen
+echo LANG=en_GB.UTF-8 > /etc/locale.conf
+export LANG=en_GB.UTF-8
+```
+
+### Network
+```bash
+# Set hostname, use whatever you want
+echo HP-Spectre-X360 > /etc/hostname
+echo $'127.0.0.1\tlocalhost\n::1\t\tlocalhost\n127.0.1.1\t'$(cat /etc/hostname) > /etc/hosts
+```
+
+### Set root password
+```bash
+passwd
+```
+
+### Install GRUB Bootloader
+```bash
+pacman -S grub efibootmgr --noconfirm
+mkdir /boot/efi
+mount /dev/nvme0n1p1 /boot/efi
+grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi
+grub-mkconfig -o /boot/grub/grub.cfg
+```
+
+### Install Xorg & Gnome. They won't be enabled
+```bash
+pacman -S xorg gnome networkmanager --noconfirm     # This might take a while
+exit                                                # Exit chroot
+shutdown now
+```
+
+### Unplug your USB here, then turn on your computer. You will need to login, the username is `root`, password is what you set earlier
+
+### Enable Gnome
+```bash
+systemctl enable gdm
+systemctl enable NetworkManager
+systemctl enable bluetooth
+reboot
+```
+
+# Software {#software}
 ### Yay
 ```bash
 sudo pacman -S git
