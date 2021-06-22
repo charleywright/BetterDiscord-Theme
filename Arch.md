@@ -75,7 +75,7 @@ timedatectl set-timezone Europe/London
 ```bash
 # Either open the file in nano or use `sed` to uncomment your locale
 less /etc/locale.gen
-sed -i -e 's/#en_GB.UTF-8/en_GB.UTF-8'/'
+sed -i -e 's/#en_GB.UTF-8/en_GB.UTF-8/'
 
 # Generate Config
 locale-gen
@@ -121,7 +121,16 @@ systemctl enable bluetooth
 reboot
 ```
 
-# Software {#software}
+### Install sudo and create user 
+```bash
+pacman -S sudo --noconfirm
+sed -i -e 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' /etc/sudoers       # Please don't kill me for using sed on /etc/sudoers. visudo is hard to explain
+useradd -G wheel -m charley                                                   # Set the username to what you want
+passwd charley                                                                # Set password for your user
+reboot
+```
+
+# Software
 ### Yay
 ```bash
 sudo pacman -S git
@@ -132,7 +141,7 @@ cd yay
 makepkg -si --noconfirm
 ```
 
-### Software
+### Useful stuff
 ```bash
 multilib=`grep -n "\[multilib\]" /etc/pacman.conf | cut -f1 -d:`
 sudo sed -i "$multilib s/^#//g" /etc/pacman.conf
