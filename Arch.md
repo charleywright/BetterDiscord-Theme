@@ -249,8 +249,8 @@ sudo chown gdm:gdm /var/lib/gdm/.config/monitors.xml
 ### Snap, Doctl & Kubectl
 ```bash
 yay -S snapd
-systemctl enable snapd.service
-systemctl start snapd.service
+sudo systemctl enable snapd.service
+sudo systemctl start snapd.service
 sudo ln -s /var/lib/snapd/snap /snap
 echo "export PATH=\"$PATH:/snap/bin\"" >> ~/.zshrc
 ```
