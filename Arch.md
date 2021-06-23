@@ -1,6 +1,6 @@
 [Skip to software](#software)
 
-# Setup, Mostly from [ItsFoss Guide](https://itsfoss.com/install-arch-linux/) {#setup}
+# Setup, Mostly from [ItsFoss Guide](https://itsfoss.com/install-arch-linux/)
 ### Set keyboard layout for setup
 ```bash
 ls /usr/share/kbd/keymaps/**/*.map.gz           # List all keyboard layouts
