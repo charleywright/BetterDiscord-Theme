@@ -75,7 +75,7 @@ timedatectl set-timezone Europe/London
 ```bash
 # Either open the file in nano or use `sed` to uncomment your locale
 less /etc/locale.gen
-sed -i -e 's/#en_GB.UTF-8/en_GB.UTF-8/'
+sed -i -e 's/#en_GB.UTF-8/en_GB.UTF-8/' /etc/locate.gen
 
 # Generate Config
 locale-gen
