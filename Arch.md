@@ -283,3 +283,15 @@ for i in /var/lib/snapd/desktop/applications/*.desktop; do
     fi;
 done
 ```
+
+### Microphone not showing in Gnome settings
+Run with device unplugged, then run again after plugging it in: 
+```bash
+pacmd list-sources | grep 'name:.*input'
+```
+
+Append these lines to `/etc/pulse/default.pa` (the device name is what is between the angled brackets):
+```bash
+load-module module-remap-source source_name=record_mono master=DEVICE_NAME master_channel_map=front-left chan>
+set-default-source record_mono
+```
