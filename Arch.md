@@ -157,7 +157,7 @@ sudo systemctl start docker
 
 ### Zsh/Oh My ZSH
 ```bash
-sudo yay -S zsh
+yay -S zsh
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 ```
 ```bash
@@ -289,8 +289,7 @@ Run with device unplugged, then run again after plugging it in:
 ```bash
 pacmd list-sources | grep 'name:.*input'
 ```
-
-Append these lines to `/etc/pulse/default.pa` (the device name is what is between the angled brackets):
+Find the name that appears after plugging the device in, for me that was `alsa_input.usb-Burr-Brown_from_TI_USB_Audio_CODEC-00.analog-stereo-input`. Now append these lines to `/etc/pulse/default.pa`, where DEVICE_NAME is the name from the previous step:
 ```bash
 load-module module-remap-source source_name=record_mono master=DEVICE_NAME master_channel_map=front-left chan>
 set-default-source record_mono
