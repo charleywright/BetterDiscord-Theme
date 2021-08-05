@@ -186,7 +186,7 @@ echo 'export PATH="$PATH:$HOME/npm/bin"' >> ~/.zshrc
 
 ### VSCode
 ```bash
-yay -S code
+yay -S visual-studio-code-bin
 wget https://raw.githubusercontent.com/charleywright/Linux-Scripts/master/VSCode/Keybinds.json -O ~/.config/Code/User/keybindings.json
 code --install-extension esbenp.prettier-vscode
 code --install-extension dbaeumer.vscode-eslint
