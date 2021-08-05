@@ -181,7 +181,7 @@ wget https://raw.githubusercontent.com/charleywright/Linux-Scripts/master/Termin
 yay -S nodejs npm
 mkdir ~/npm
 npm config set prefix ~/npm
-echo "export PATH=\"$PATH:$HOME/npm/bin\"" >> ~/.zshrc
+echo 'export PATH="$PATH:$HOME/npm/bin"' >> ~/.zshrc
 ```
 
 ### VSCode
@@ -252,7 +252,7 @@ yay -S snapd
 sudo systemctl enable snapd.service
 sudo systemctl start snapd.service
 sudo ln -s /var/lib/snapd/snap /snap
-echo "export PATH=\"$PATH:/snap/bin\"" >> ~/.zshrc
+echo 'export PATH="$PATH:/snap/bin"' >> ~/.zshrc
 ```
 ```bash
 sudo snap install kubectl --classic
