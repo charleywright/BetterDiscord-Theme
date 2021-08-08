@@ -149,7 +149,7 @@ sudo sed -i "$multilib s/^#//g" /etc/pacman.conf
 multilib=$(( $multilib + 1 ))
 sudo sed -i "$multilib s/^#//g" /etc/pacman.conf
 sudo pacman -Sy
-yay -S google-chrome neofetch wget curl spotify discord dotnet-sdk docker vlc ntfs-3g steam steam-fonts appimagelauncher alsa-firmware sof-firmware alsa-ucm-conf libappindicator-gtk3 noto-fonts noto-fonts-extra noto-fonts-emoji noto-fonts-cjk plank vlc handbrake postman-bin tidal-hifi atom
+yay -S google-chrome neofetch wget curl spotify discord dotnet-sdk docker vlc ntfs-3g steam steam-fonts appimagelauncher alsa-firmware sof-firmware alsa-ucm-conf libappindicator-gtk3 noto-fonts noto-fonts-extra noto-fonts-emoji noto-fonts-cjk plank vlc handbrake postman-bin tidal-hifi atom htop bashtop
 sudo usermod -aG docker $USER
 sudo systemctl enable docker
 sudo systemctl start docker
