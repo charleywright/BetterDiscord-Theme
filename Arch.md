@@ -187,7 +187,6 @@ echo 'export PATH="$PATH:$HOME/npm/bin"' >> ~/.zshrc
 ### VSCode
 ```bash
 yay -S visual-studio-code-bin
-wget https://raw.githubusercontent.com/charleywright/Linux-Scripts/master/VSCode/Keybinds.json -O ~/.config/Code/User/keybindings.json
 code --install-extension esbenp.prettier-vscode
 code --install-extension dbaeumer.vscode-eslint
 code --install-extension rvest.vs-code-prettier-eslint
@@ -203,6 +202,7 @@ code --install-extension formulahendry.auto-close-tag
 code --install-extension ms-dotnettools.csharp # Only if you have already installed the dotnet CLI
 code --install-extension ms-vscode.cpptools
 mkdir -p ~/.config/Code/User
+wget https://raw.githubusercontent.com/charleywright/Linux-Scripts/master/VSCode/Keybinds.json -O ~/.config/Code/User/keybindings.json
 echo "{\"workbench.iconTheme\": \"material-icon-theme\",\"workbench.colorTheme\": \"One Dark Pro\"}" > ~/.config/Code/User/settings.json
 ```
 
