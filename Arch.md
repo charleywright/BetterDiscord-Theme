@@ -229,6 +229,8 @@ gsettings set org.gnome.desktop.interface enable-hot-corners false
 * [User-themes](https://extensions.gnome.org/extension/19/user-themes/)
 * [KStatusNotifierItem/AppIndicator Support](https://extensions.gnome.org/extension/615/appindicator-support/)
 
+* Rebind Alt+Tab to "Switch windows" to get the expected usage
+
 ### [Dash to Dock](https://extensions.gnome.org/extension/307/dash-to-dock/)
 ```bash
 dconf write /org/gnome/shell/extensions/dash-to-dock/preferred-monitor 0
