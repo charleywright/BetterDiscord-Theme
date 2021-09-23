@@ -297,3 +297,8 @@ Find the name that appears after plugging the device in, for me that was `alsa_i
 load-module module-remap-source source_name=record_mono master=DEVICE_NAME master_channel_map=front-left chan>
 set-default-source record_mono
 ```
+
+### Invalid or Corrupted package (PGP Signature)
+``bash
+sudo pacman -S archlinux-keyring
+```
