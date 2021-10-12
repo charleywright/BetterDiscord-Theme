@@ -300,6 +300,6 @@ set-default-source record_mono
 ```
 
 ### Invalid or Corrupted package (PGP Signature)
-``bash
+```bash
 sudo pacman -S archlinux-keyring
 ```
