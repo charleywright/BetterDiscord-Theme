@@ -303,3 +303,19 @@ set-default-source record_mono
 ```bash
 sudo pacman -S archlinux-keyring
 ```
+
+### Wine MSBuild
+[Bug 51762](https://www.winehq.org/pipermail/wine-bugs/2021-September/561971.html)
+```bash
+rm -rf ~/.cache/wine*
+wineboot
+winetricks -q arial d3dcompiler_47 dotnet472
+winetricks vstools2019
+sha256sum ~/.cache/winetricks/vstools2019/vstools2019.zip
+nano /usr/bin/winetricks # update the hash in load_vstools2019() to the one above
+winetricks vstools2019
+wget https://aka.ms/vs/16/release/installer -O vs_installer.opc
+mkdir -p opc
+unzip -d opc vs_installer.opc
+wine opc/Contents/vs_installer.exe install --channelId VisualStudio.16.Release --channelUri "https://aka.ms/vs/16/release/channel" --productId Microsoft.VisualStudio.Product.BuildTools
+```
