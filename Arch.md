@@ -245,6 +245,8 @@ dconf write /org/gnome/shell/extensions/dash-to-dock/background-opacity 0.0
 ```
 
 ### Fix for firefox styling
+Enable user themes by going to `about:config` and setting `toolkit.legacyUserProfileCustomizations.stylesheets` to `true`
+Download and install theme:
 ```bash
 ROOT=$(ls ~/.mozilla/firefox | grep release)
 mkdir -p ~/.mozilla/firefox/$ROOT/chrome
