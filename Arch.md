@@ -149,7 +149,7 @@ sudo sed -i "$multilib s/^#//g" /etc/pacman.conf
 multilib=$(( $multilib + 1 ))
 sudo sed -i "$multilib s/^#//g" /etc/pacman.conf
 sudo pacman -Sy
-yay -S google-chrome neofetch wget curl spotify discord dotnet-sdk docker vlc ntfs-3g steam steam-fonts appimagelauncher alsa-firmware sof-firmware alsa-ucm-conf libappindicator-gtk3 noto-fonts noto-fonts-extra noto-fonts-emoji noto-fonts-cjk plank vlc handbrake postman-bin tidal-hifi atom htop bashtop
+yay -S firefox neofetch wget curl spotify discord dotnet-sdk docker vlc ntfs-3g steam steam-fonts appimagelauncher alsa-firmware sof-firmware alsa-ucm-conf libappindicator-gtk3 noto-fonts noto-fonts-extra noto-fonts-emoji noto-fonts-cjk plank vlc handbrake postman-bin tidal-hifi atom htop bashtop
 sudo usermod -aG docker $USER
 sudo systemctl enable docker
 sudo systemctl start docker
@@ -242,6 +242,13 @@ dconf write /org/gnome/shell/extensions/dash-to-dock/show-trash false
 dconf write /org/gnome/shell/extensions/dash-to-dock/custom-theme-shrink true
 dconf write /org/gnome/shell/extensions/dash-to-dock/transparency-mode "'FIXED'"
 dconf write /org/gnome/shell/extensions/dash-to-dock/background-opacity 0.0
+```
+
+### Fix for firefox styling
+```bash
+ROOT=$(ls ~/.mozilla/firefox | grep release)
+mkdir -p ~/.mozilla/firefox/$ROOT/chrome
+wget https://raw.githubusercontent.com/charleywright/Linux-Scripts/master/Firefox/userChrome.css -O ~/.mozilla/firefox/$ROOT/chrome/userChrome.css
 ```
 
 ### Correct monitor config on Gnome login screen

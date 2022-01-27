@@ -1,0 +1,7 @@
+/* ---Tabs/Tab Bar height--- */
+:root {
+  --tab-min-height: 26px !important;
+ }
+ 
+ .titlebar-spacer[type="pre-tabs"] {border-inline-end: 0px !important;width: 1px !important;}
+ 
