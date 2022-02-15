@@ -163,6 +163,18 @@ sudo snap connect doctl:kube-config
 sudo snap connect doctl:dot-docker
 ```
 
+### Update GCC
+```bash
+sudo apt install gcc g++ g++-11 gcc-11
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 50
+sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 50
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 40
+sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 40
+
+sudo update-alternatives --config gcc
+sudo update-alternatives --config g++
+``
+
 ### BetterGnome
 ```bash
 sudo apt install gnome-tweaks gnome-shell-extensions papirus-icon-theme plank -y
