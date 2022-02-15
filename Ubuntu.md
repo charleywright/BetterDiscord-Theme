@@ -173,7 +173,7 @@ sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 40
 
 sudo update-alternatives --config gcc
 sudo update-alternatives --config g++
-``
+```
 
 ### BetterGnome
 ```bash
