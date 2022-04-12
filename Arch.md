@@ -228,7 +228,8 @@ gsettings set org.gnome.desktop.interface enable-hot-corners false
 * [Transparent top bar](https://extensions.gnome.org/extension/3960/transparent-top-bar-adjustable-transparency/)
 * [User-themes](https://extensions.gnome.org/extension/19/user-themes/)
 * [KStatusNotifierItem/AppIndicator Support](https://extensions.gnome.org/extension/615/appindicator-support/)
-* [Pixel-Saver](https://extensions.gnome.org/extension/723/pixel-saver/)
+* [No Title Bar](https://extensions.gnome.org/extension/2015/no-title-bar-forked/)
+* [Hide Activities Button](https://extensions.gnome.org/extension/744/hide-activities-button/)
 
 * Rebind Alt+Tab to "Switch windows" to get the expected usage
 
