@@ -1,12 +1,15 @@
 /**
  * @name CopyRawMessage
+ * @author DevilBro
  * @authorId 278543574059057154
+ * @version 1.1.3
+ * @description Allows you to copy the raw Contents of a Message
  * @invite Jx3TjNS
  * @donate https://www.paypal.me/MircoWittrien
  * @patreon https://www.patreon.com/MircoWittrien
- * @website https://github.com/mwittrien/BetterDiscordAddons/tree/master/Plugins/CopyRawMessage
- * @source https://raw.githubusercontent.com/mwittrien/BetterDiscordAddons/master/Plugins/CopyRawMessage/CopyRawMessage.plugin.js
- * @updateUrl https://raw.githubusercontent.com/mwittrien/BetterDiscordAddons/master/Plugins/CopyRawMessage/CopyRawMessage.plugin.js
+ * @website https://mwittrien.github.io/
+ * @source https://github.com/mwittrien/BetterDiscordAddons/tree/master/Plugins/CopyRawMessage/
+ * @updateUrl https://mwittrien.github.io/BetterDiscordAddons/Plugins/CopyRawMessage/CopyRawMessage.plugin.js
  */
 
 module.exports = (_ => {
@@ -14,12 +17,12 @@ module.exports = (_ => {
 		"info": {
 			"name": "CopyRawMessage",
 			"author": "DevilBro",
-			"version": "1.1.2",
-			"description": "Add a entry in the contextmenu when you right click a message that allows you to copy the raw contents of a message"
+			"version": "1.1.3",
+			"description": "Allows you to copy the raw Contents of a Message"
 		},
 		"changeLog": {
-			"improved": {
-				"Quick Action": "Added Icon to quick action bar. Holding shift while hovering a message shows the quick action bar"
+			"added": {
+				"Embed JSON": "Can now copy embed in json format"
 			}
 		}
 	};
@@ -28,7 +31,14 @@ module.exports = (_ => {
 		getName () {return config.info.name;}
 		getAuthor () {return config.info.author;}
 		getVersion () {return config.info.version;}
-		getDescription () {return `The Library Plugin needed for ${config.info.name} is missing. Open the Plugin Settings to download it.\n\n${config.info.description}`;}
+		getDescription () {return `The Library Plugin needed for ${config.info.name} is missing. Open the Plugin Settings to download it. \n\n${config.info.description}`;}
+		
+		downloadLibrary () {
+			require("request").get("https://mwittrien.github.io/BetterDiscordAddons/Library/0BDFDB.plugin.js", (e, r, b) => {
+				if (!e && b && r.statusCode == 200) require("fs").writeFile(require("path").join(BdApi.Plugins.folder, "0BDFDB.plugin.js"), b, _ => BdApi.showToast("Finished downloading BDFDB Library", {type: "success"}));
+				else BdApi.alert("Error", "Could not download BDFDB Library Plugin. Try again later or download it manually from GitHub: https://mwittrien.github.io/downloader/?library");
+			});
+		}
 		
 		load () {
 			if (!window.BDFDB_Global || !Array.isArray(window.BDFDB_Global.pluginQueue)) window.BDFDB_Global = Object.assign({}, window.BDFDB_Global, {pluginQueue: []});
@@ -40,10 +50,7 @@ module.exports = (_ => {
 					onCancel: _ => {delete window.BDFDB_Global.downloadModal;},
 					onConfirm: _ => {
 						delete window.BDFDB_Global.downloadModal;
-						require("request").get("https://mwittrien.github.io/BetterDiscordAddons/Library/0BDFDB.plugin.js", (e, r, b) => {
-							if (!e && b && b.indexOf(`* @name BDFDB`) > -1) require("fs").writeFile(require("path").join(BdApi.Plugins.folder, "0BDFDB.plugin.js"), b, _ => {});
-							else BdApi.alert("Error", "Could not download BDFDB Library Plugin, try again later or download it manually from GitHub: https://github.com/mwittrien/BetterDiscordAddons/tree/master/Library/");
-						});
+						this.downloadLibrary();
 					}
 				});
 			}
@@ -54,64 +61,22 @@ module.exports = (_ => {
 		getSettingsPanel () {
 			let template = document.createElement("template");
 			template.innerHTML = `<div style="color: var(--header-primary); font-size: 16px; font-weight: 300; white-space: pre; line-height: 22px;">The Library Plugin needed for ${config.info.name} is missing.\nPlease click <a style="font-weight: 500;">Download Now</a> to install it.</div>`;
-			template.content.firstElementChild.querySelector("a").addEventListener("click", _ => {
-				require("request").get("https://mwittrien.github.io/BetterDiscordAddons/Library/0BDFDB.plugin.js", (e, r, b) => {
-					if (!e && b && b.indexOf(`* @name BDFDB`) > -1) require("fs").writeFile(require("path").join(BdApi.Plugins.folder, "0BDFDB.plugin.js"), b, _ => {});
-					else BdApi.alert("Error", "Could not download BDFDB Library Plugin, try again later or download it manually from GitHub: https://github.com/mwittrien/BetterDiscordAddons/tree/master/Library/");
-				});
-			});
+			template.content.firstElementChild.querySelector("a").addEventListener("click", this.downloadLibrary);
 			return template.content.firstElementChild;
 		}
 	} : (([Plugin, BDFDB]) => {
-		var settings = {};
-	
 		return class CopyRawMessage extends Plugin {
-			onLoad () {
-				this.defaults = {
-					settings: {
-						copyOnlySelected:		{value: true, 				description: "Only copy selected text of a message"}
-					}
-				};
-			}
+			onLoad () {}
 			
-			onStart () {
-				this.forceUpdateAll();
-			}
+			onStart () {}
 			
-			onStop () {
-				this.forceUpdateAll();
-			}
-
-			getSettingsPanel (collapseStates = {}) {
-				let settingsPanel, settingsItems = [];
-				
-				for (let key in settings) settingsItems.push(BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.SettingsSaveItem, {
-					type: "Switch",
-					plugin: this,
-					keys: ["settings", key],
-					label: this.defaults.settings[key].description,
-					value: settings[key]
-				}));
-				
-				return settingsPanel = BDFDB.PluginUtils.createSettingsPanel(this, settingsItems);
-			}
-
-			onSettingsClosed () {
-				if (this.SettingsUpdated) {
-					delete this.SettingsUpdated;
-					this.forceUpdateAll();
-				}
-			}
-		
-			forceUpdateAll () {
-				settings = BDFDB.DataUtils.get(this, "settings");
-			}
+			onStop () {}
 
 			onMessageContextMenu (e) {
 				if (e.instance.props.message) {
 					let content = e.instance.props.message.content;
 					let messageString = [e.instance.props.message.content, BDFDB.ArrayUtils.is(e.instance.props.message.attachments) && e.instance.props.message.attachments.map(n => n.url)].flat(10).filter(n => n).join("\n");
-					let selectedText = settings.copyOnlySelected && document.getSelection().toString().trim();
+					let selectedText = document.getSelection().toString().trim();
 					if (selectedText) messageString = BDFDB.StringUtils.extractSelection(messageString, selectedText);
 					let embed = BDFDB.DOMUtils.getParent(BDFDB.dotCN.embedwrapper, e.instance.props.target);
 					let embedData = e.instance.props.message.embeds[embed ? Array.from(embed.parentElement.querySelectorAll(BDFDB.dotCN.embedwrapper)).indexOf(embed) : -1];
@@ -122,27 +87,51 @@ module.exports = (_ => {
 						messageString && BDFDB.ContextMenuUtils.createItem(BDFDB.LibraryComponents.MenuItems.MenuItem, {
 							label: BDFDB.LanguageUtils.LanguageStrings.COPY_TEXT + " (Raw)",
 							id: BDFDB.ContextMenuUtils.createItemId(this.name, "copy-message"),
-							hint: hint && (_ => {
-								return BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.MenuItems.MenuHint, {
-									hint: hint
-								});
+							type: "Message",
+							hint: hint && (_ => BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.MenuItems.MenuHint, {
+								hint: hint
+							})),
+							icon: _ => BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.SvgIcon, {
+								className: BDFDB.disCN.menuicon,
+								name: BDFDB.LibraryComponents.SvgIcon.Names.RAW_TEXT
 							}),
-							action: _ => {
-								BDFDB.LibraryRequires.electron.clipboard.write({text: messageString});
-							}
+							action: _ => BDFDB.LibraryRequires.electron.clipboard.write({text: messageString})
 						}),
 						embedString && BDFDB.ContextMenuUtils.createItem(BDFDB.LibraryComponents.MenuItems.MenuItem, {
 							label: BDFDB.LanguageUtils.LanguageStrings.COPY_TEXT + " (Raw Embed)",
 							id: BDFDB.ContextMenuUtils.createItemId(this.name, "copy-embed"),
-							action: _ => {
-								BDFDB.LibraryRequires.electron.clipboard.write({text: embedString});
-							}
+							type: "Embed",
+							icon: _ => BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.SvgIcon, {
+								className: BDFDB.disCN.menuicon,
+								name: BDFDB.LibraryComponents.SvgIcon.Names.RAW_TEXT
+							}),
+							action: _ => BDFDB.LibraryRequires.electron.clipboard.write({text: embedString})
+						}),
+						embedData && BDFDB.ContextMenuUtils.createItem(BDFDB.LibraryComponents.MenuItems.MenuItem, {
+							label: BDFDB.LanguageUtils.LanguageStrings.COPY_TEXT + " (Embed JSON)",
+							type: "Embed JSON",
+							id: BDFDB.ContextMenuUtils.createItemId(this.name, "copy-embed-json"),
+							icon: _ => BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.SvgIcon, {
+								className: BDFDB.disCN.menuicon,
+								name: BDFDB.LibraryComponents.SvgIcon.Names.RAW_TEXT
+							}),
+							action: _ => BDFDB.LibraryRequires.electron.clipboard.write({text: JSON.stringify(embedData)})
 						})
 					].filter(n => n);
 					if (entries.length) {
 						let [children, index] = BDFDB.ContextMenuUtils.findItem(e.returnvalue, {id: "devmode-copy-id", group: true});
+						children.splice(index > -1 ? index : children.length, 0, );
 						children.splice(index > -1 ? index : children.length, 0, BDFDB.ContextMenuUtils.createItem(BDFDB.LibraryComponents.MenuItems.MenuGroup, {
-							children: entries
+							children: entries.length > 1 ? BDFDB.ContextMenuUtils.createItem(BDFDB.LibraryComponents.MenuItems.MenuItem, {
+								label: BDFDB.LanguageUtils.LanguageStrings.COPY_TEXT,
+								id: BDFDB.ContextMenuUtils.createItemId(this.name, "copy-raw-submenu"),
+								children: entries.map(n => {
+									n.props.label = n.props.type;
+									delete n.props.type;
+									delete n.props.icon;
+									return n;
+								})
+							}) : entries
 						}));
 					}
 				}
@@ -154,15 +143,11 @@ module.exports = (_ => {
 					children.splice(index + 1, 0, BDFDB.ContextMenuUtils.createItem(BDFDB.LibraryComponents.MenuItems.MenuItem, {
 						label: BDFDB.LanguageUtils.LanguageStrings.COPY_TEXT + " (Raw)",
 						id: BDFDB.ContextMenuUtils.createItemId(this.name, "copy-message-raw"),
-						icon: _ => {
-							return BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.SvgIcon, {
-								className: BDFDB.disCN.menuicon,
-								name: BDFDB.LibraryComponents.SvgIcon.Names.RAW_TEXT
-							});
-						},
-						action: _ => {
-							BDFDB.LibraryRequires.electron.clipboard.write({text: e.instance.props.message.content});
-						}
+						icon: _ => BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.SvgIcon, {
+							className: BDFDB.disCN.menuicon,
+							name: BDFDB.LibraryComponents.SvgIcon.Names.RAW_TEXT
+						}),
+						action: _ => BDFDB.LibraryRequires.electron.clipboard.write({text: e.instance.props.message.content})
 					}));
 				}
 			}

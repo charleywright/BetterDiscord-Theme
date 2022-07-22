@@ -2,7 +2,7 @@
  * @name CreationDate
  * @author DevilBro
  * @authorId 278543574059057154
- * @version 1.4.1
+ * @version 1.4.6
  * @description Displays the Creation Date of an Account in the UserPopout and UserModal
  * @invite Jx3TjNS
  * @donate https://www.paypal.me/MircoWittrien
@@ -17,12 +17,12 @@ module.exports = (_ => {
 		"info": {
 			"name": "CreationDate",
 			"author": "DevilBro",
-			"version": "1.4.1",
+			"version": "1.4.6",
 			"description": "Displays the Creation Date of an Account in the UserPopout and UserModal"
 		},
 		"changeLog": {
-			"improved": {
-				"New Settings": "Changed the Settings Panel for the Plugin, Settings got reset sowwy ~w~"
+			"fixed": {
+				"User Popout": "Fixing Stuff for the User Popout Update, thanks Discord"
 			}
 		}
 	};
@@ -82,8 +82,8 @@ module.exports = (_ => {
 				
 				this.patchedModules = {
 					after: {
-						UserPopout: "render",
-						AnalyticsContext: "render"
+						UserPopoutInfo: "UserPopoutInfo",
+						UserProfileModalHeader: "default"
 					}
 				};
 				
@@ -154,22 +154,17 @@ module.exports = (_ => {
 				}
 			}
 
-			processUserPopout (e) {
+			processUserPopoutInfo (e) {
 				if (e.instance.props.user && this.settings.places.userPopout) {
-					let [children, index] = BDFDB.ReactUtils.findParent(e.returnvalue, {name: "CustomStatus"});
-					if (index > -1) this.injectDate(children, 2, e.instance.props.user);
+					let [children, index] = BDFDB.ReactUtils.findParent(e.returnvalue, {name: ["DiscordTag", "ColoredFluxTag"]});
+					if (index > -1) this.injectDate(children, index + 1, e.instance.props.user);
 				}
 			}
 
-			processAnalyticsContext (e) {
-				if (typeof e.returnvalue.props.children == "function" && e.instance.props.section == BDFDB.DiscordConstants.AnalyticsSections.PROFILE_MODAL && this.settings.places.userProfile) {
-					let renderChildren = e.returnvalue.props.children;
-					e.returnvalue.props.children = (...args) => {
-						let renderedChildren = renderChildren(...args);
-						let [children, index] = BDFDB.ReactUtils.findParent(renderedChildren, {name: ["DiscordTag", "ColoredFluxTag"]});
-						if (index > -1) this.injectDate(children, 1, children[index].props.user);
-						return renderedChildren;
-					};
+			processUserProfileModalHeader (e) {
+				if (e.instance.props.user && this.settings.places.userProfile) {
+					let [children, index] = BDFDB.ReactUtils.findParent(e.returnvalue, {name: ["DiscordTag", "ColoredFluxTag"]});
+					if (index > -1) this.injectDate(children, index + 1, e.instance.props.user);
 				}
 			}
 			
@@ -186,6 +181,10 @@ module.exports = (_ => {
 					case "bg":		// Bulgarian
 						return {
 							created_at:							"Създадено на {{time}}"
+						};
+					case "cs":		// Czech
+						return {
+							created_at:							"Vytvořeno {{time}}"
 						};
 					case "da":		// Danish
 						return {
@@ -210,6 +209,10 @@ module.exports = (_ => {
 					case "fr":		// French
 						return {
 							created_at:							"Créé le {{time}}"
+						};
+					case "hi":		// Hindi
+						return {
+							created_at:							"{{time}} को बनाया गया"
 						};
 					case "hr":		// Croatian
 						return {
@@ -285,7 +288,7 @@ module.exports = (_ => {
 						};
 					case "zh-TW":	// Chinese (Taiwan)
 						return {
-							created_at:							"創建於{{time}}"
+							created_at:							"建立於{{time}}"
 						};
 					default:		// English
 						return {

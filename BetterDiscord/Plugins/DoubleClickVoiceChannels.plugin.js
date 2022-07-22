@@ -1,139 +1,168 @@
 /**
- * @name DoubleClickVoiceChannels
- * @invite yNqzuJa
- * @authorLink https://github.com/Metalloriff
- * @donate https://www.paypal.me/israelboone
- * @website https://metalloriff.github.io/toms-discord-stuff/
- * @source https://github.com/Metalloriff/BetterDiscordPlugins/blob/master/DoubleClickVoiceChannels.plugin.js
- */
+* @name DoubleClickVoiceChannels
+* @description Requires you to double click voice channels to join them.
+* @author Qb, Twizzer#0001 & AAGaming#9395
+* @authorId 133659541198864384
+* @version 1.0.0
+* @invite pKx8m6Z
+* @license Unlicensed
+* @source https://github.com/QbDesu/BetterDiscordAddons/blob/potato/Plugins/DoubleClickVoiceChannels
+* @updateUrl https://raw.githubusercontent.com/QbDesu/BetterDiscordAddons/potato/Plugins/DoubleClickVoiceChannels/DoubleClickVoiceChannels.plugin.js
+*/
+/*@cc_on
+@if (@_jscript)
+
+// Offer to self-install for clueless users that try to run this directly.
+var shell = WScript.CreateObject("WScript.Shell");
+var fs = new ActiveXObject("Scripting.FileSystemObject");
+var pathPlugins = shell.ExpandEnvironmentStrings("%APPDATA%\BetterDiscord\plugins");
+var pathSelf = WScript.ScriptFullName;
+// Put the user at ease by addressing them in the first person
+shell.Popup("It looks like you've mistakenly tried to run me directly. \n(Don't do that!)", 0, "I'm a plugin for BetterDiscord", 0x30);
+if (fs.GetParentFolderName(pathSelf) === fs.GetAbsolutePathName(pathPlugins)) {
+    shell.Popup("I'm in the correct folder already.", 0, "I'm already installed", 0x40);
+} else if (!fs.FolderExists(pathPlugins)) {
+    shell.Popup("I can't find the BetterDiscord plugins folder.\nAre you sure it's even installed?", 0, "Can't install myself", 0x10);
+} else if (shell.Popup("Should I copy myself to BetterDiscord's plugins folder for you?", 0, "Do you need some help?", 0x34) === 6) {
+    fs.CopyFile(pathSelf, fs.BuildPath(pathPlugins, fs.GetFileName(pathSelf)), true);
+    // Show the user where to put plugins in the future
+    shell.Exec("explorer " + pathPlugins);
+    shell.Popup("I'm installed!", 0, "Successfully installed", 0x40);
+}
+WScript.Quit();
+
+@else@*/
 
 module.exports = (() => {
-	const config =
-	{
-		info:
-		{
-			name: "DoubleClickVoiceChannels",
-			authors:
-				[
-					{
-						name: "Metalloriff",
-						discord_id: "264163473179672576",
-						github_username: "metalloriff",
-						twitter_username: "Metalloriff"
-					}
-				],
-			version: "2.0.4",
-			description: "Requires you to double click voice channels to join them.",
-			github: "https://github.com/Metalloriff/BetterDiscordPlugins/blob/master/DoubleClickVoiceChannels.plugin.js",
-			github_raw: "https://raw.githubusercontent.com/Metalloriff/BetterDiscordPlugins/master/DoubleClickVoiceChannels.plugin.js"
-		},
-		changelog:
-			[
-				{
-					title: "Patched",
-					type: "fixed",
-					items: ["Fixed again. Thanks cmd430 for the help!"]
-				}
-			]
-	};
+    const config = {
+        info: {
+            name: "DoubleClickVoiceChannels",
+            version: "1.0.0",
+            github_raw: "https://raw.githubusercontent.com/QbDesu/BetterDiscordAddons/potato/Plugins/DoubleClickVoiceChannels/DoubleClickVoiceChannels.plugin.js"
+        }
+    };
+    return !global.ZeresPluginLibrary ? class {
+        constructor() { this._config = config; }
+        load() {
+            BdApi.showConfirmationModal("Library plugin is needed",
+                [`The library plugin needed for ${config.info.name} is missing. Please click Download Now to install it.`], {
+                confirmText: "Download",
+                cancelText: "Cancel",
+                onConfirm: () => {
+                    require("request").get("https://rauenzi.github.io/BDPluginLibrary/release/0PluginLibrary.plugin.js", async (error, response, body) => {
+                        if (error) return require("electron").shell.openExternal("https://betterdiscord.app/Download?id=9");
+                        await new Promise(r => {
+                            require("fs").writeFile(require("path").join(BdApi.Plugins.folder, "0PluginLibrary.plugin.js"), body, r);
+                            window.location.reload();
+                        });
+                    });
+                }
+            });
+        }
+        start() { }
+        stop() { }
+    }
+: (([Plugin, Api]) => {
+    const plugin = (Plugin, Api) => {
+		const {
+            Patcher,
+            WebpackModules,
+            Logger
+		} = Api;
 
-	return !global.ZeresPluginLibrary ? class {
-		constructor() { this._config = config; }
+        const ChannelItem = WebpackModules.getModule(m => m?.default?.displayName == "ChannelItem");
+        const ChannelMention = WebpackModules.getModule(m => m?.default?.displayName == "Mention");
 
-		getName = () => config.info.name;
-		getAuthor = () => config.info.description;
-		getVersion = () => config.info.version;
+        return class GuildNotificationDefaults extends Plugin {
+            constructor() {
+                super();
+                // remove need for duplication of metadata fields
+                this.getAuthor = null;
+                this.getDescription = null;
+            }
+            
+            async onStart() {
+                Patcher.after(ChannelItem, "default", (that, args, value) => {
+                    const channel = this.getChannel(value);
+                    if (channel) {
+                        if (channel.type === 2 || channel.type === 13) {
+                            const clickable = this.getClickable(value);
+                            if (clickable) {
+                                clickable.onDoubleClick = clickable.onClick;
+                                delete clickable.onClick;
+                            }
+                        }
+                    } else {
+                        Logger.warn('Failed to find channel.');
+                    }
+        
+                    return value;
+                });
 
-		load() {
-			BdApi.showConfirmationModal("Library Missing", `The library plugin needed for ${config.info.name} is missing. Please click Download Now to install it.`, {
-				confirmText: "Download Now",
-				cancelText: "Cancel",
-				onConfirm: () => {
-					require("request").get("https://rauenzi.github.io/BDPluginLibrary/release/0PluginLibrary.plugin.js", async (err, res, body) => {
-						if (err) return require("electron").shell.openExternal("https://betterdiscord.net/ghdl?url=https://raw.githubusercontent.com/rauenzi/BDPluginLibrary/master/release/0PluginLibrary.plugin.js");
-						await new Promise(r => require("fs").writeFile(require("path").join(BdApi.Plugins.folder, "0PluginLibrary.plugin.js"), body, r));
-					});
-				}
-			});
-		}
+                Patcher.after(ChannelMention, "default", (that, args, value) => {
+                    const label = this.getLabel(value);
+                    if (label && label === 'Voice Channel') {
+                        const { props } = value;
+                        props.onDoubleClick = props.onClick;
+                        delete props.onClick;
+                    }
+        
+                    return value;
+                });
+            }
 
-		start() { }
-		stop() { }
-	} : (([Plugin, Api]) => {
-
-		const plugin = (Plugin, Api) => {
-			const { WebpackModules, Patcher, Utilities, ReactComponents } = Api;
-
-			return class DoubleClickVoiceChannels extends Plugin {
-				constructor() {
-					super();
-				}
-
-				async showChangelog(footer) {
-					try { footer = (await WebpackModules.getByProps("getUser", "acceptAgreements").getUser("264163473179672576")).tag + " | https://discord.gg/yNqzuJa"; }
-					finally { super.showChangelog(footer); }
-				}
-
-				async onStart() {
-					const { component: ChannelItem } = await ReactComponents.getComponentByName("VoiceChannel", "*");
-				
-					if (ChannelItem) {
-						Patcher.after(ChannelItem.prototype, "render", (r, _, el) => {
-					  const children_type0 = Utilities.getNestedProp(el, "props.children.props.children.0.props.children.props.children");
-					  const children_type1 = Utilities.getNestedProp(el, "props.children.0.props.children.props.children");
-				
-							if (children_type0 || children_type1) {
-						const handleClick = (children) => {
-						  const c = children();
-				
-									const handler = c.props.children;
-									c.props.children = () => {
-										const h = handler({});
-				
-										if (!h.props.connected) {
-											// for whatever reason, onDoubleClick stopped working, so here's a dumb workaround
-											const onClick = h.props.onClick;
-											let t = performance.now() - 200;
-				
-											h.props.onClick = () => {
-												if (performance.now() - t < 200)
-													onClick();
-				
-												t = performance.now();
-											};
-										}
-				
-										return h;
-									};
-				
-									return c;
-						};
-						
-						if (children_type0) {
-						  el.props.children.props.children[0].props.children.props.children = () => {
-							return handleClick(children_type0);
-						  };
-						} 
-						if (children_type1) {
-						  el.props.children[0].props.children.props.children = () => {
-							return handleClick(children_type1);
-						  };
-								};
-				
-							}
-							else {
-								console.warn("DoubleClickVoiceChannel: Failed to get nested props!");
-							}
-						});
-					}
-				}
-
-				onStop() {
-					Patcher.unpatchAll();
-				}
+			onStop() {
+                Patcher.unpatchAll();
 			}
-		};
-
-		return plugin(Plugin, Api);
-	})(global.ZeresPluginLibrary.buildPlugin(config));
+        
+            shouldDescend(key) {
+                return key === 'props' || key === 'children' || !isNaN(key);
+            }
+        
+            getChannel(obj) {
+                for (const key in obj) {
+                    const inner = obj[key];
+                    if (inner && typeof inner === 'object') {
+                        if (key === 'channel') {
+                            return inner;
+                        } else if (this.shouldDescend(key)) {
+                            return this.getChannel(inner);
+                        }
+                    }
+                }
+                return null;
+            }
+        
+            getClickable(obj) {
+                for (const key in obj) {
+                    const inner = obj[key];
+                    if (inner && typeof inner === 'object') {
+                        if (inner.onClick && inner.role === 'button') {
+                            return inner;
+                        } else if (this.shouldDescend(key)) {
+                            return this.getClickable(inner);
+                        }
+                    }
+                }
+                return null;
+            }
+        
+            getLabel(obj) {
+                for (const key in obj) {
+                    const inner = obj[key];
+                    if (inner) {
+                        if (key === 'aria-label') {
+                            return inner;
+                        } else if (typeof inner === 'object' && this.shouldDescend(key)) {
+                            return this.getLabel(inner);
+                        }
+                    }
+                }
+                return null;
+            }
+        };
+    };
+    return plugin(Plugin, Api);
+})(global.ZeresPluginLibrary.buildPlugin(config));
 })();
+/*@end@*/
