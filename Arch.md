@@ -143,7 +143,8 @@ makepkg -si --noconfirm
 
 ### Useful stuff
 ```bash
-cat "keyserver keyserver.ubuntu.com" > ~/.gnupg/gpg.conf
+mkdir ~/.gnupg
+echo "keyserver keyserver.ubuntu.com" > ~/.gnupg/gpg.conf
 multilib=`grep -n "\[multilib\]" /etc/pacman.conf | cut -f1 -d:`
 sudo sed -i "$multilib s/^#//g" /etc/pacman.conf
 multilib=$(( $multilib + 1 ))
