@@ -57,6 +57,7 @@ reflector -c "GB" -f 12 -l 10 -n 12 --save /etc/pacman.d/mirrorlist
 ```bash
 mount /dev/nvme0n1p2 /mnt
 pacstrap /mnt base linux linux-firmware vim nano
+# If the above fails, try "rm -R /var/lib/pacman/sync/" then "pacman -Sy", then run again
 ```
 
 ### Configure
