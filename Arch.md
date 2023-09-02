@@ -331,3 +331,20 @@ mkdir -p opc
 unzip -d opc vs_installer.opc
 wine opc/Contents/vs_installer.exe install --channelId VisualStudio.16.Release --channelUri "https://aka.ms/vs/16/release/channel" --productId Microsoft.VisualStudio.Product.BuildTools
 ```
+
+### Albert
+Install albert and xcape
+```bash
+yay -S albert xcape
+```
+Create `/etc/xdg/autostart/xcape.desktop` with the following contents:
+```
+[Desktop Entry]
+Version=1.0
+Name=XCape rebinds
+Exec=/usr/bin/xcape -e 'Super_L=Control_L|space'
+Terminal=false
+Type=Application
+X-GNOME-Autostart-Phase=Applications
+```
+This will cause the left meta/super/windows key to trigger Ctrl+Space which can then be used as Albert's keybind
